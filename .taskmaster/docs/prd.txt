@@ -1,0 +1,184 @@
+<context>
+
+# Overview
+
+jitter-kit is an immersive, web-based digital canvas for artists, designers, and creative developers to explore and generate complex, grid-based visual systems. It solves the problem of generative art being either too simplistic in GUI-based tools or having too steep a learning curve in purely code-based libraries.
+
+It is for multidisciplinary creative professionals who need a tool to rapidly prototype and generate sophisticated visual assets. jitter-kit is valuable because it bridges the gap between creative exploration and practical application, allowing users to export their static creations as resolution-independent SVGs and their animations as clean, developer-ready GSAP scripts.
+
+# Core Features
+
+1. Layer-Based Generative Engine
+
+- What it does: Allows users to create, stack, and manage multiple, independent generative art layers in a single project.
+- Why it's important: Building complex compositions requires layering. This system provides a familiar and powerful workflow, similar to professional design software like Photoshop or Figma.
+- How it works: A dedicated panel lists all layers. Users can add new layers, rename them, delete them, toggle their visibility, and reorder them via drag-and-drop. The rendering engine draws the layers from bottom to top.
+
+2. Dynamic Generative Algorithms
+
+- What it does: Provides a suite of distinct algorithms that form the creative core of the tool. The v1.0 algorithms are: Uniform Grid, Noise Displacement Grid, Recursive Subdivision, and Isometric Grid.
+- Why it's important: The variety of algorithms gives users a diverse creative palette, enabling a wide range of aesthetic outcomes from structured and geometric to organic and chaotic.
+- How it works: Users select an algorithm for a given layer. A context-aware parameter panel then displays sliders and dropdowns unique to that algorithm, allowing for real-time manipulation of the visual output.
+
+3. Clipping Masks
+
+- What it does: A simple but powerful feature that allows any layer to act as a mask for the single layer directly beneath it in the stack.
+- Why it's important: It enables users to create complex shapes and compositions (e.g., a pattern constrained within a circle) without needing complex drawing or masking tools.
+- How it works: Each layer item has a toggle button. When enabled, the layer's shape and alpha channel are used to clip the visibility of the layer immediately below it.
+
+4. Project Persistence (Save/Load)
+
+- What it does: Allows users to save their entire project state to a local file and load it back into the application later.
+- Why it's important: Creative work is iterative and time-consuming. This feature ensures users never lose their progress and can maintain a library of their projects.
+- How it works: A "Save" button serializes the entire state of all layers and their parameters into a structured .json file and downloads it. A "Load" button allows the user to select a previously saved .json file, which then completely rebuilds the project state in the application.
+
+5. Professional Export Formats (SVG & GSAP)
+
+-  What it does: Exports the user's creation into two versatile, professional formats.
+-  Why it's important: This makes jitter-kit a practical tool, not just a toy. The assets it produces can be directly used in professional web development and graphic design workflows.
+-  How it works:
+   - SVG: Exports the static state of the canvas as a clean, layered SVG file, perfect for import into tools like Adobe Illustrator.
+   - GSAP: Exports a pre-defined animation as a developer-ready JavaScript file using the GSAP library, which can be easily integrated into web projects. This is presented in a modal with a "Copy to Clipboard" button.
+
+# User Experience
+
+User Personas
+
+- Maria, the Graphic Designer/Digital Artist: Maria is highly visual and proficient with tools like Photoshop and Illustrator. She wants to explore generative patterns for backgrounds, textures, and posters. She values intuitive interfaces, powerful color tools, and the ability to export high-quality vectors (SVG) for further refinement.
+- Alex, the Creative Web Developer: Alex builds interactive websites and animations for clients. They are comfortable with code but want to accelerate their creative process. They are looking for a tool to quickly generate complex, performant animations. The GSAP export feature is critical for their workflow.
+
+# Key User Flows
+
+## Flow 1: Creating a Static Composition from Scratch
+
+User opens jitter-kit to a blank canvas.
+User clicks "+ Add Layer" in the Control Panel. A default "Uniform Grid" layer appears.
+User adjusts sliders in the "Structure" accordion to change grid density and gutter.
+User clicks the color swatch, opening the Color Picker modal to select a new color palette.
+User adds a second layer, changing its algorithm to "Noise Displacement".
+User enables the "Clipping Mask" toggle on the top layer to constrain the noise grid within the shape of the bottom layer.
+Satisfied, the user navigates to the "Export" accordion and clicks "Export to SVG". The file is saved.
+
+## Flow 2: Creating and Exporting an Animation
+
+User loads a previously saved project file using the "Load Project" button.
+User selects a layer to animate.
+User opens the "Animation" accordion and selects the "Pulse Scale" animation from the dropdown. They adjust the Speed slider.
+User navigates to the "Export" accordion and clicks "Export to GSAP".
+A modal appears with the generated JavaScript code. Alex clicks "Copy to Clipboard" and pastes it into their code editor.
+
+# UI/UX Considerations
+
+- Layout: A single, static "Unified Control Panel" is fixed to the left to provide a stable, predictable interface. The rest of the screen is dedicated to the creative canvas.
+- Interaction Model: To maintain a clean primary interface, focused tasks like renaming layers or picking colors are handled in dedicated modal windows.
+- Feedback: The application provides immediate, real-time visual feedback. As a user moves a slider, the canvas updates instantly. Active and hovered states on UI elements are clear and distinct.
+- Technical Architecture
+
+# System Components
+
+- Framework: Next.js (v13+ with App Router) using TypeScript. We will primarily use its Static Site Generation (SSG) capabilities.
+- Rendering Engine: p5.js for 2D canvas rendering and generative art logic. It will be integrated as a React component.
+- State Management: Zustand for simple, modern global state management. It will hold the entire project state, including the layers array and selectedLayerId.
+- Linting & Formatting: ESLint 9 (with the eslint.config.js flat config) and Prettier, enforced by Husky git hooks to maintain code quality.
+
+# Data Models
+The core data model is the Project state object, which will be serialized to JSON.
+
+TypeScript
+
+```typescript
+interface Project {
+  layers: Layer[];
+  selectedLayerId: string | null;
+}
+
+interface Layer {
+  id: string;
+  name: string;
+  type: 'grid' | 'mask'; // Simplified for this example
+  visible: boolean;
+  isClipped: boolean;
+  parameters: {
+    algorithm: 'uniform' | 'noise' | 'recursive' | 'isometric';
+    density: number;
+    gutter: number;
+    colorPalette: string[];
+    // ... other algorithm-specific params
+  };
+  animation: {
+    type: 'none' | 'pulseScale' | 'cycleColor';
+    speed: number;
+    duration: number;
+  };
+}
+```
+
+# APIs and Integrations
+
+The v1.0 application is purely client-side. There are no backend APIs.
+
+It integrates with the p5.js library for drawing and GSAP (GreenSock Animation Platform) for generating animation export code.
+
+# Infrastructure Requirements
+
+- Source Control: GitHub repository.
+- Deployment: Vercel, connected to the GitHub repository for seamless continuous deployment and preview environments for every pull request.
+
+# Development Roadmap
+
+## MVP Requirements (jitter-kit v1.0)
+The scope of the initial release is defined by the following feature set, which must be completed in full:
+
+1. Core Application Shell: The Next.js app with the static control panel and canvas layout.
+2. Layer Management System: Full CRUD (Create, Read, Update, Delete) functionality for layers, including reordering and visibility.
+3. Generative Algorithms: Implementation of all four specified algorithms (Uniform, Noise, Recursive, Isometric) and their unique parameters.
+4. Parameter Controls: A fully functional parameter panel with sliders, dropdowns, and the color picker modal.
+5. Clipping Mask Feature: The toggle and rendering logic for single-layer clipping.
+6. Project Save/Load: The JSON serialization and file I/O functionality.
+7. Export System: Both SVG and GSAP export features must be fully implemented as specified.
+
+# Future Enhancements
+
+v1.1 - Refinement & Workflow: An advanced preset library, UI themes, performance optimization.
+v2.0 - Community & Discovery: User accounts, cloud saving, and a public gallery for sharing creations.
+v2.1 - Advanced Animation: A keyframe-based timeline for creating complex, custom animations.
+v3.0 - Professional & Extensible: Vector import, a plugin API for custom algorithms, and video export capabilities.
+
+# Logical Dependency Chain
+
+The development will proceed in a logical order to get to a usable, visible front-end as quickly as possible, with each feature building upon the last.
+
+- Foundation Setup: Initialize the Next.js/TypeScript/ESLint 9/p5.js project in the GitHub repo and connect it to Vercel.
+- Shell Construction: Build the static UI shell: the Header and the UnifiedControlPanel components, with placeholder content. This establishes the layout.
+- Canvas Integration: Create the Canvas component and get a single, hard-coded p5.js sketch rendering inside it. At this point, we have something visible on screen.
+- State Management: Implement the Zustand store (store.ts) with the initial Project data model.
+- Layer List Rendering: Connect the LayerList component to the store to render a list of hard-coded layers. Make layer selection work, updating the selectedLayerId in the store.
+- Parameter Panel Connection: Connect the ParameterPanel to the store. It should now display the parameters of the selectedLayerId. Initially, the controls won't do anything.
+- Interactive Controls: Make the sliders and dropdowns functional, so that changing a control updates the corresponding parameter in the Zustand store.
+- Reactive Canvas: Refactor the Canvas component to subscribe to the Zustand store. Now, when a parameter is changed via a slider, the canvas re-renders with the new data. This is the first point where the full creative loop is complete.
+- Full Feature Implementation: With the core loop working, build out the remaining features in an atomic way:
+- Full implementation of all four generative algorithms.
+- Layer CRUD operations (Add, Delete, Rename).
+- Drag-and-drop reordering.
+- Clipping Mask logic.
+- Save/Load functionality.
+- Finally, the Export system, as it depends on all other systems being in place.
+
+# Risks and Mitigations
+
+## Technical Challenge: Performance
+
+Risk: Rendering many complex, multi-layered canvases with real-time parameter changes could lead to poor performance and a sluggish UI.
+Mitigation: Proactive performance management. We will use React.memo to prevent unnecessary re-renders of components and explore offscreen canvas buffering techniques for layers that are not actively being changed.
+
+
+## Project Risk: Scope Creep
+
+Risk: The potential to add small, "easy" features during development that are outside the defined v1.0 scope, leading to delays.
+Mitigation: Strict adherence to this PRD as the single source of truth for the MVP. All new ideas will be documented and triaged for a future release (e.g., v1.1).
+
+## Resource Risk: Knowledge Silos
+
+Risk: With a small team, critical knowledge about the architecture or a specific feature might reside with only one person.
+Mitigation: A commitment to thorough documentation. This PRD is the first step. All code will be well-commented, and complex architectural decisions will be documented within the codebase or a team wiki.
+</context>
