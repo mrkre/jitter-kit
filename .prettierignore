@@ -1,0 +1,15 @@
+# Ignore artifacts:
+*.css
+*.md
+.claude
+.cursor
+.github
+.next
+.roo
+.taskmaster
+.tsbuildinfo
+dist
+node_modules
+package-lock.json
+pnpm-lock.yaml
+yarn.lock 
