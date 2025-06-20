@@ -17,7 +17,6 @@ Modern Next.js 15+ application built with TypeScript, ESLint 9, Prettier, and co
 ## Project Structure
 
 ```bash
-src/
 ├── app/                  # App Router pages and layouts
 ├── components/           # Reusable UI components
 │   ├── ui/               # Base UI components
