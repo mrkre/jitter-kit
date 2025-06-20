@@ -29,5 +29,8 @@ out/
 *.sln
 *.sw?
 
+# TS
+*.tsbuildinfo
+
 # OS specific
 .DS_Store
