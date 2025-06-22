@@ -3,12 +3,6 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
-    branches:
-      - 'feat/**'
-      - 'chore/**'
-      - 'fix/**'
-      - 'refactor/**'
-      - 'test/**'
     
     # Optional: Only run on specific file changes
     # paths:
@@ -19,6 +13,12 @@ on:
 
 jobs:
   claude-review:
+    if: |
+      startsWith(github.head_ref, 'feat/') ||
+      startsWith(github.head_ref, 'chore/') ||
+      startsWith(github.head_ref, 'fix/') ||
+      startsWith(github.head_ref, 'refactor/') ||
+      startsWith(github.head_ref, 'test/')
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
