@@ -1,4 +1,23 @@
 {
+  "version": "0.0.1",
+  "name": "jitter-kit",
+  "description": "Jitter Kit is a toolkit for building AI-powered applications.",
+  "author": "Jitter Kit",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrkre/jitter-kit.git"
+  },
+  "keywords": [
+    "design",
+    "ai",
+    "nextjs",
+    "tailwind",
+    "typescript"
+  ],
+  "private": false,
+  "packageManager": "pnpm@9.15.0",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

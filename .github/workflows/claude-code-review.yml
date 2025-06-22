@@ -3,6 +3,13 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
+    branches:
+      - 'feat/**'
+      - 'chore/**'
+      - 'fix/**'
+      - 'refactor/**'
+      - 'test/**'
+    
     # Optional: Only run on specific file changes
     # paths:
     #   - "src/**/*.ts"
