@@ -55,6 +55,12 @@ export interface Layer {
     density: number
     gutter: number
     colorPalette: string[]
+    // Common visual variations
+    shapeVariety?: number
+    sizeVariation?: number
+    displacementIntensity?: number
+    colorVariation?: number
+    heightVariation?: number
     // Algorithm-specific params
     scale?: number // For perlin noise
     depth?: number // For fractals and L-systems

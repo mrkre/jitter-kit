@@ -1,18 +1,15 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-
-import '@/styles/globals.css'
-
 import AppShell from '@/components/AppShell'
 import { ToastProvider } from '@/components/ui/ToastProvider'
-import { version } from '../package.json'
+import pkg from '../package.json'
+import '@/styles/globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'jitter-kit',
-  description:
-    'Modern generative art toolkit for creating grid-based patterns and animations',
+  title: 'Jitter Kit',
+  description: 'A generative art playground built with Next.js and p5.js',
 }
 
 export default function RootLayout({
@@ -24,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ToastProvider>
-          <AppShell version={version}>{children}</AppShell>
+          <AppShell version={pkg.version}>{children}</AppShell>
         </ToastProvider>
       </body>
     </html>
