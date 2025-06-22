@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Header from './Header'
 import UnifiedControlPanel from './UnifiedControlPanel'
 
@@ -13,35 +13,35 @@ export default function AppShell({ children }: AppShellProps) {
   const [isMobile, setIsMobile] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const handleResize = () => {
-    const mobile = window.innerWidth < 768
+  const handleResize = useCallback(() => {
+    const mobile = window.innerWidth < 768 // md breakpoint
     setIsMobile(mobile)
-    if (!mobile) {
-      setIsSidebarOpen(true)
-    } else {
+    if (mobile) {
       setIsSidebarOpen(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [handleResize])
 
-  const toggleSidebar = () => {
+  const toggleSidebar = useCallback(() => {
     if (isMobile) {
-      setIsSidebarOpen(!isSidebarOpen)
+      setIsSidebarOpen((prev) => !prev)
     } else {
-      setIsSidebarCollapsed(!isSidebarCollapsed)
+      setIsSidebarCollapsed((prev) => !prev)
     }
-  }
+  }, [isMobile])
 
   return (
     <div className="h-screen bg-gray-50">
-      {/* Sidebar: always present in the DOM, fixed position */}
+      {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'} `}
+        className={`fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out will-change-transform ${
+          isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'
+        }`}
       >
         <UnifiedControlPanel
           isCollapsed={isSidebarCollapsed && !isMobile}
@@ -58,9 +58,11 @@ export default function AppShell({ children }: AppShellProps) {
         />
       )}
 
-      {/* Content Area: gets padding to avoid sidebar */}
+      {/* Content Area */}
       <div
-        className={`flex h-screen flex-col transition-all duration-300 ease-in-out ${isMobile ? 'pl-0' : isSidebarCollapsed ? 'pl-16' : 'pl-80'} `}
+        className={`flex h-screen flex-col transition-all duration-300 ease-in-out md:pl-80 ${
+          isMobile ? 'pl-0' : isSidebarCollapsed ? 'md:pl-16' : 'md:pl-80'
+        }`}
       >
         <Header />
         <main className="flex-1 overflow-y-auto">
