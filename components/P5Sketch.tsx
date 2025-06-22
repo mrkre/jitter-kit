@@ -9,14 +9,16 @@ interface P5SketchProps {
   density?: number
   speed?: number
   selectedColor?: string
+  className?: string
 }
 
 export default function P5Sketch({
-  width = 800,
-  height = 600,
+  width,
+  height,
   density = 10,
   speed = 1,
   selectedColor = 'purple',
+  className = '',
 }: P5SketchProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const p5InstanceRef = useRef<p5 | null>(null)
@@ -24,29 +26,42 @@ export default function P5Sketch({
   useEffect(() => {
     if (!containerRef.current) return
 
+    // Clean up any existing p5 instance
+    if (p5InstanceRef.current) {
+      p5InstanceRef.current.remove()
+      p5InstanceRef.current = null
+    }
+
+    const container = containerRef.current
+    const rect = container.getBoundingClientRect()
+
+    // Use provided dimensions or container dimensions
+    const canvasWidth = width || Math.max(rect.width, 100)
+    const canvasHeight = height || Math.max(rect.height, 100)
+
+    // Prevent extreme canvas sizes
+    const finalWidth = Math.min(canvasWidth, 2000)
+    const finalHeight = Math.min(canvasHeight, 2000)
+
     const sketch = (p: p5) => {
       let particles: Array<{ x: number; y: number; vx: number; vy: number }> =
         []
 
       p.setup = () => {
-        p.createCanvas(width, height)
+        p.createCanvas(finalWidth, finalHeight)
         initializeParticles()
       }
 
       p.draw = () => {
         p.background(248, 250, 252) // bg-slate-50
 
-        // Update and draw particles
+        // Draw simple particles
         for (let i = 0; i < particles.length; i++) {
           const particle = particles[i]
 
-          // Add jitter to movement
-          particle.vx += p.random(-0.1, 0.1) * speed
-          particle.vy += p.random(-0.1, 0.1) * speed
-
-          // Update position
-          particle.x += particle.vx
-          particle.y += particle.vy
+          // Simple movement
+          particle.x += particle.vx * speed
+          particle.y += particle.vy * speed
 
           // Wrap around edges
           if (particle.x < 0) particle.x = p.width
@@ -58,7 +73,7 @@ export default function P5Sketch({
           p.push()
           setColorFromString(selectedColor)
           p.noStroke()
-          p.circle(particle.x, particle.y, 8)
+          p.circle(particle.x, particle.y, 6)
           p.pop()
         }
       }
@@ -97,15 +112,39 @@ export default function P5Sketch({
     return () => {
       if (p5InstanceRef.current) {
         p5InstanceRef.current.remove()
+        p5InstanceRef.current = null
       }
     }
   }, [width, height, density, speed, selectedColor])
 
+  // Prevent scrolling when interacting with canvas
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const preventScroll = (e: WheelEvent | TouchEvent) => {
+      e.preventDefault()
+    }
+
+    container.addEventListener('wheel', preventScroll, { passive: false })
+    container.addEventListener('touchmove', preventScroll, { passive: false })
+
+    return () => {
+      container.removeEventListener('wheel', preventScroll)
+      container.removeEventListener('touchmove', preventScroll)
+    }
+  }, [])
+
   return (
     <div
       ref={containerRef}
-      className="rounded-lg"
-      style={{ touchAction: 'auto' }}
+      className={`h-full w-full rounded-lg ${className}`}
+      style={{
+        touchAction: 'none',
+        overflow: 'hidden',
+        minHeight: height || '100%',
+        minWidth: width || '100%',
+      }}
     />
   )
 }
