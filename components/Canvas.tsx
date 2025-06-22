@@ -14,20 +14,18 @@ export default function Canvas() {
       if (!isFullscreen) {
         if (canvasContainerRef.current.requestFullscreen) {
           await canvasContainerRef.current.requestFullscreen()
-        } else if (
-          (canvasContainerRef.current as any).webkitRequestFullscreen
-        ) {
-          await (canvasContainerRef.current as any).webkitRequestFullscreen()
-        } else if ((canvasContainerRef.current as any).msRequestFullscreen) {
-          await (canvasContainerRef.current as any).msRequestFullscreen()
+        } else if (canvasContainerRef.current.webkitRequestFullscreen) {
+          await canvasContainerRef.current.webkitRequestFullscreen()
+        } else if (canvasContainerRef.current.msRequestFullscreen) {
+          await canvasContainerRef.current.msRequestFullscreen()
         }
       } else {
         if (document.exitFullscreen) {
           await document.exitFullscreen()
-        } else if ((document as any).webkitExitFullscreen) {
-          await (document as any).webkitExitFullscreen()
-        } else if ((document as any).msExitFullscreen) {
-          await (document as any).msExitFullscreen()
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen()
+        } else if (document.msExitFullscreen) {
+          await document.msExitFullscreen()
         }
       }
     } catch (err) {
@@ -39,8 +37,8 @@ export default function Canvas() {
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).msFullscreenElement
+        document.webkitFullscreenElement ||
+        document.msFullscreenElement
       )
       setIsFullscreen(isCurrentlyFullscreen)
     }

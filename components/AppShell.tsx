@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import UnifiedControlPanel from './UnifiedControlPanel'
+import React, { useState, useEffect } from 'react'
 import Header from './Header'
+import UnifiedControlPanel from './UnifiedControlPanel'
 
 interface AppShellProps {
   children: React.ReactNode
