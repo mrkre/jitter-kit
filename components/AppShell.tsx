@@ -38,30 +38,31 @@ export default function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
-      <Header onMenuClick={toggleSidebar} />
+    <div className="h-screen bg-gray-50">
+      {/* Sidebar: always present in the DOM, fixed position */}
+      <div
+        className={`fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'} `}
+      >
+        <UnifiedControlPanel
+          isCollapsed={isSidebarCollapsed && !isMobile}
+          onToggleCollapse={toggleSidebar}
+          isMobile={isMobile}
+        />
+      </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Mobile Menu Overlay */}
-        {isMobile && isSidebarOpen && (
-          <div
-            className="bg-opacity-50 fixed inset-0 z-30 bg-black md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar */}
+      {/* Mobile Menu Overlay */}
+      {isMobile && isSidebarOpen && (
         <div
-          className={` ${isMobile ? 'fixed inset-y-0 left-0' : 'relative'} ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'} z-40 transition-transform duration-300 ease-in-out`}
-        >
-          <UnifiedControlPanel
-            isCollapsed={isSidebarCollapsed && !isMobile}
-            onToggleCollapse={toggleSidebar}
-            isMobile={isMobile}
-          />
-        </div>
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-        {/* Main Content Area */}
+      {/* Content Area: gets padding to avoid sidebar */}
+      <div
+        className={`flex h-screen flex-col transition-all duration-300 ease-in-out ${isMobile ? 'pl-0' : isSidebarCollapsed ? 'pl-16' : 'pl-80'} `}
+      >
+        <Header />
         <main className="flex-1 overflow-y-auto">
           <div className="container mx-auto p-4 md:p-6 lg:p-8">{children}</div>
         </main>

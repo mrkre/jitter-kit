@@ -1,3 +1,5 @@
+import Canvas from '@/components/Canvas'
+
 export default function Home() {
   return (
     <div className="space-y-6">
@@ -32,15 +34,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Canvas placeholder */}
-      <div className="flex min-h-[400px] items-center justify-center rounded-lg bg-white p-6 shadow-sm">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-32 w-32 rounded-lg bg-gray-200"></div>
-          <p className="text-gray-500">
-            Canvas area - Pattern editor will go here
-          </p>
-        </div>
-      </div>
+      {/* Canvas */}
+      <Canvas />
     </div>
   )
 }
