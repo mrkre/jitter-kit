@@ -10,7 +10,7 @@ type ButtonVariant =
   | 'ghost'
   | 'outline'
   | 'destructive'
-type ButtonSize = 'sm' | 'md' | 'lg' | 'icon'
+type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'icon'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
@@ -35,6 +35,7 @@ const variantStyles: Record<ButtonVariant, string> = {
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
+  xs: 'h-6 w-6 p-0',
   sm: 'h-8 px-3 text-sm',
   md: 'h-10 px-4 text-sm',
   lg: 'h-12 px-6 text-base',
@@ -61,7 +62,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       inline-flex items-center justify-center gap-2 rounded-lg font-medium
       transition-all duration-200 
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-      disabled:cursor-not-allowed disabled:opacity-50
+      disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer
     `
 
     const widthStyles = fullWidth ? 'w-full' : ''
@@ -134,6 +135,7 @@ function LoadingSpinner({ size }: { size: ButtonSize }) {
 
 function getIconSize(size: ButtonSize): string {
   const iconSizes: Record<ButtonSize, string> = {
+    xs: 'h-3 w-3',
     sm: 'h-4 w-4',
     md: 'h-5 w-5',
     lg: 'h-6 w-6',

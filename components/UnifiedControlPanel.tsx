@@ -48,8 +48,10 @@ export default function UnifiedControlPanel({
       // Simulate export operation
       await new Promise((resolve) => setTimeout(resolve, 2000))
       // TODO: Implement actual export logic
+      // eslint-disable-next-line no-console
       console.log(`Exporting as ${type}...`)
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Export failed:', error)
     } finally {
       setExportLoading(null)

@@ -3,6 +3,11 @@
 import { useRef, useEffect } from 'react'
 import p5 from 'p5'
 
+// Define a type for our custom p5 instance
+interface CustomP5 extends p5 {
+  updateWithProps: (props: P5SketchProps) => void
+}
+
 interface P5SketchProps {
   width?: number
   height?: number
@@ -13,74 +18,68 @@ interface P5SketchProps {
 }
 
 export default function P5Sketch({
-  width,
-  height,
   density = 10,
   speed = 1,
   selectedColor = 'purple',
   className = '',
 }: P5SketchProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const p5InstanceRef = useRef<p5 | null>(null)
+  const p5InstanceRef = useRef<CustomP5 | null>(null)
 
+  // Effect for sketch creation and destruction
   useEffect(() => {
     if (!containerRef.current) return
 
-    // Clean up any existing p5 instance
-    if (p5InstanceRef.current) {
-      p5InstanceRef.current.remove()
-      p5InstanceRef.current = null
-    }
-
     const container = containerRef.current
-    const rect = container.getBoundingClientRect()
 
-    // Use provided dimensions or container dimensions
-    const canvasWidth = width || Math.max(rect.width, 100)
-    const canvasHeight = height || Math.max(rect.height, 100)
-
-    // Prevent extreme canvas sizes
-    const finalWidth = Math.min(canvasWidth, 2000)
-    const finalHeight = Math.min(canvasHeight, 2000)
-
-    const sketch = (p: p5) => {
+    const sketch = (p: CustomP5) => {
       let particles: Array<{ x: number; y: number; vx: number; vy: number }> =
         []
 
+      // Keep local copies of props to be updated
+      let localDensity = density
+      let localSpeed = speed
+      let localSelectedColor = selectedColor
+
       p.setup = () => {
-        p.createCanvas(finalWidth, finalHeight)
+        p.createCanvas(container.clientWidth, container.clientHeight)
         initializeParticles()
       }
 
       p.draw = () => {
         p.background(248, 250, 252) // bg-slate-50
 
-        // Draw simple particles
-        for (let i = 0; i < particles.length; i++) {
-          const particle = particles[i]
+        for (const particle of particles) {
+          particle.x += particle.vx * localSpeed
+          particle.y += particle.vy * localSpeed
 
-          // Simple movement
-          particle.x += particle.vx * speed
-          particle.y += particle.vy * speed
-
-          // Wrap around edges
           if (particle.x < 0) particle.x = p.width
           if (particle.x > p.width) particle.x = 0
           if (particle.y < 0) particle.y = p.height
           if (particle.y > p.height) particle.y = 0
 
-          // Draw particle
           p.push()
-          setColorFromString(selectedColor)
+          setColorFromString(localSelectedColor)
           p.noStroke()
           p.circle(particle.x, particle.y, 6)
           p.pop()
         }
       }
 
+      p.updateWithProps = (props: P5SketchProps) => {
+        if (props.speed !== undefined) localSpeed = props.speed
+        if (props.selectedColor !== undefined)
+          localSelectedColor = props.selectedColor
+
+        if (props.density !== undefined && props.density !== localDensity) {
+          localDensity = props.density
+          initializeParticles()
+        }
+      }
+
       function initializeParticles() {
         particles = []
-        for (let i = 0; i < density; i++) {
+        for (let i = 0; i < localDensity; i++) {
           particles.push({
             x: p.random(p.width),
             y: p.random(p.height),
@@ -101,21 +100,32 @@ export default function P5Sketch({
           indigo: [99, 102, 241],
           teal: [20, 184, 166],
         }
-
         const [r, g, b] = colors[colorName] || colors.purple
         p.fill(r, g, b)
       }
     }
 
-    p5InstanceRef.current = new p5(sketch, containerRef.current)
+    p5InstanceRef.current = new p5(sketch, container) as CustomP5
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries[0]) return
+      const { width, height } = entries[0].contentRect
+      p5InstanceRef.current?.resizeCanvas(width, height)
+    })
+
+    resizeObserver.observe(container)
 
     return () => {
-      if (p5InstanceRef.current) {
-        p5InstanceRef.current.remove()
-        p5InstanceRef.current = null
-      }
+      resizeObserver.unobserve(container)
+      p5InstanceRef.current?.remove()
     }
-  }, [width, height, density, speed, selectedColor])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty dependency array ensures this runs only once on mount
+
+  // Effect for updating props
+  useEffect(() => {
+    p5InstanceRef.current?.updateWithProps({ density, speed, selectedColor })
+  }, [density, speed, selectedColor])
 
   // Prevent scrolling when interacting with canvas
   useEffect(() => {
@@ -142,8 +152,6 @@ export default function P5Sketch({
       style={{
         touchAction: 'none',
         overflow: 'hidden',
-        minHeight: height || '100%',
-        minWidth: width || '100%',
       }}
     />
   )
