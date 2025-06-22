@@ -1,42 +1,94 @@
-name: Release & Changelog
+name: Automated Release
 
 on:
-  push:
-    branches:
-      - main
-
-permissions:
-  contents: write
+ workflow_dispatch:
+   inputs:
+     release_type:
+       description: 'Release type (leave empty for auto-detection)'
+       required: false
+       default: ''
+       type: choice
+       options:
+         - 'patch'
+         - 'minor' 
+         - 'major'
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          # This is required to get the full commit history for changelog generation
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Conventional Changelog Action
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          # We don't want to commit a CHANGELOG.md file,
-          # but we do want the version bump and tag.
-          # The output will be used to create a GitHub release.
-          output-file: "false"
-
-      - name: Create Release
-        uses: actions/create-release@v1
-        if: ${{ steps.changelog.outputs.skipped == 'false' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.changelog.outputs.tag }}
-          release_name: ${{ steps.changelog.outputs.tag }}
-          body: ${{ steps.changelog.outputs.clean_changelog }} 
+ release:
+   runs-on: ubuntu-latest
+   permissions:
+     contents: write
+     pull-requests: write
+     
+   steps:
+     - name: Checkout repository
+       uses: actions/checkout@v4
+       with:
+         fetch-depth: 0
+         token: ${{ secrets.GITHUB_TOKEN }}
+ 
+     - name: Generate release
+       id: changelog
+       uses: TriPSs/conventional-changelog-action@v6
+       with:
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+         output-file: "CHANGELOG.md"
+         release-count: "0"
+         git-branch: "release/automated-${{ github.run_number }}"
+         skip-on-empty: "true"
+         skip-version-file: "false"
+         skip-commit: "false"
+         git-message: 'chore(release): {version}'
+         preset: 'angular'
+         tag-prefix: 'v'
+         pre-commit: "pnpm run build"
+         
+     - name: Create Release Pull Request
+       if: ${{ steps.changelog.outputs.skipped == 'false' }}
+       uses: peter-evans/create-pull-request@v5
+       with:
+         token: ${{ secrets.GITHUB_TOKEN }}
+         branch: "release/automated-${{ github.run_number }}"
+         base: main
+         title: "🚀 Release ${{ steps.changelog.outputs.tag }}"
+         body: |
+           ## Release ${{ steps.changelog.outputs.tag }}
+           
+           This is an automated release pull request.
+           
+           ### Changes
+           ${{ steps.changelog.outputs.changelog }}
+           
+           ### Checklist
+           - [x] Version bumped
+           - [x] Changelog updated
+           - [x] Tests passing
+           - [ ] Ready to merge
+           
+           ---
+           *This PR was generated automatically by the release workflow.*
+         labels: |
+           release
+           automated
+         reviewers: |
+           # Add your maintainer usernames here
+           mrkre
+         draft: false
+         
+     - name: Comment on PR with release info
+       if: ${{ steps.changelog.outputs.skipped == 'false' }}
+       run: |
+         echo "Release PR created: release/automated-${{ github.run_number }}"
+         echo "Version: ${{ steps.changelog.outputs.tag }}"
+         echo "Clean changelog: ${{ steps.changelog.outputs.clean_changelog }}"
+         
+     - name: Output release information
+       if: ${{ steps.changelog.outputs.skipped == 'false' }}
+       run: |
+         echo "::notice::Release ${{ steps.changelog.outputs.tag }} is ready for review"
+         echo "::notice::PR branch: release/automated-${{ github.run_number }}"
+         
+     - name: No changes detected
+       if: ${{ steps.changelog.outputs.skipped == 'true' }}
+       run: |
+         echo "::notice::No conventional commits found, skipping release"
