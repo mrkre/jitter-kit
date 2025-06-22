@@ -1,6 +1,12 @@
 'use client'
 
-import { InputHTMLAttributes, forwardRef, useState, useEffect } from 'react'
+import {
+  InputHTMLAttributes,
+  forwardRef,
+  useState,
+  useEffect,
+  useRef,
+} from 'react'
 
 interface SliderProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
@@ -36,27 +42,43 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
     },
     ref
   ) => {
-    const [internalValue, setInternalValue] = useState(defaultValue)
-    const isControlled = controlledValue !== undefined
-    const currentValue = isControlled ? controlledValue : internalValue
+    const [displayValue, setDisplayValue] = useState(
+      controlledValue ?? defaultValue
+    )
+    const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-    const percentage = ((currentValue - min) / (max - min)) * 100
+    const percentage = ((displayValue - min) / (max - min)) * 100
 
     useEffect(() => {
-      if (isControlled && controlledValue !== undefined) {
-        setInternalValue(controlledValue)
+      if (controlledValue !== undefined) {
+        setDisplayValue(controlledValue)
       }
-    }, [controlledValue, isControlled])
+    }, [controlledValue])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = parseFloat(e.target.value)
 
-      if (!isControlled) {
-        setInternalValue(newValue)
+      // Update display immediately for smooth UI
+      setDisplayValue(newValue)
+
+      // Debounce the onChange callback to reduce rerendering
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
       }
 
-      onChange?.(newValue)
+      debounceRef.current = setTimeout(() => {
+        onChange?.(newValue)
+      }, 150) // 150ms delay
     }
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+      return () => {
+        if (debounceRef.current) {
+          clearTimeout(debounceRef.current)
+        }
+      }
+    }, [])
 
     return (
       <div className={`space-y-2 ${className}`}>
@@ -69,7 +91,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
             )}
             {showValue && (
               <span className="text-xs font-medium text-gray-700">
-                {formatValue(currentValue)}
+                {formatValue(displayValue)}
               </span>
             )}
           </div>
@@ -85,7 +107,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
 
           <div className="relative">
             {/* Track */}
-            <div className="absolute inset-0 h-2 rounded-full bg-gray-200">
+            <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gray-200">
               {/* Filled track */}
               <div
                 className="absolute h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
@@ -101,13 +123,13 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
               min={min}
               max={max}
               step={step}
-              value={currentValue}
+              value={displayValue}
               onChange={handleChange}
               className="relative z-10 w-full cursor-pointer appearance-none bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-purple-500 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:hover:scale-110 [&::-moz-range-thumb]:active:scale-125 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-purple-500 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:active:scale-125"
               aria-label={label}
               aria-valuemin={min}
               aria-valuemax={max}
-              aria-valuenow={currentValue}
+              aria-valuenow={displayValue}
               {...props}
             />
           </div>

@@ -47,6 +47,10 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## Algorithms
 
+- **Uniform Grid**: Simple, uniform grid of shapes
+- **Noise Displacement Grid**: Grid with elements displaced by a noise field
+- **Recursive Subdivision**: A surface recursively divided into smaller shapes
+- **Isometric Grid**: A grid with an isometric perspective
 - **Perlin Noise Fields**: Flowing, organic patterns
 - **Fractal Trees**: Recursive branching structures
 - **Particle Systems**: Dynamic moving elements

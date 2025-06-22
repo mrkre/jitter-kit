@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Implement Animation Loop
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: If supporting animated jitter, implement a timing/animation loop (e.g., using requestAnimationFrame) to update the canvas based on the current speed and pattern parameters.
+# Details:
+
+
+# Test Strategy:
+

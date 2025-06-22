@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Connect UI Controls to Jitter Engine
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: Wire up the UnifiedControlPanel sliders and controls (density, speed, etc.) to the jitter engine and canvas. Use React state or context to propagate control values to the canvas rendering logic.
+# Details:
+
+
+# Test Strategy:
+

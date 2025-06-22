@@ -141,6 +141,11 @@ export const selectPresets = {
     { value: 'noise', label: 'Noise Displacement' },
     { value: 'recursive', label: 'Recursive Subdivision' },
     { value: 'isometric', label: 'Isometric Grid' },
+    { value: 'perlin', label: 'Perlin Noise Fields' },
+    { value: 'fractal', label: 'Fractal Trees' },
+    { value: 'particles', label: 'Particle Systems' },
+    { value: 'cellular', label: 'Cellular Automata' },
+    { value: 'lsystem', label: 'L-Systems' },
   ],
 
   animations: [

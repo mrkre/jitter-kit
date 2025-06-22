@@ -1,26 +1,15 @@
 'use client'
 
-import Canvas from '@/components/Canvas'
+import { Canvas } from '@/components/Canvas'
 import { useWelcomeVisibilityContext } from '@/components/WelcomeVisibilityContext'
 
 export default function Home() {
   const { showWelcome, isLoaded } = useWelcomeVisibilityContext()
 
-  // Prevent hydration mismatch by not rendering until loaded
-  if (!isLoaded) {
-    return (
-      <div className="flex h-full flex-col gap-6">
-        <div className="flex-1">
-          <Canvas />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="flex h-full flex-col gap-6">
       {/* Welcome Content - conditionally rendered */}
-      {showWelcome && (
+      {showWelcome && isLoaded && (
         <>
           <div className="rounded-lg bg-white p-6 shadow-sm">
             <h1 className="mb-2 text-3xl font-bold text-gray-900">
@@ -55,9 +44,9 @@ export default function Home() {
         </>
       )}
 
-      {/* Canvas - expands to fill available space */}
+      {/* Canvas - always rendered with stable key to prevent re-mounting */}
       <div className="flex-1">
-        <Canvas />
+        <Canvas key="main-canvas" />
       </div>
     </div>
   )

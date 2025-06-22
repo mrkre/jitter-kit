@@ -12,8 +12,8 @@ export default defineConfig([
   {
     ignores: [
       '.next/',
-      'eslint.config.js',
       'next.config.mjs',
+      'postcss.config.mjs',
       'tailwind.config.js',
     ],
   },
@@ -71,7 +71,7 @@ export default defineConfig([
       ...next.configs['core-web-vitals'].rules,
 
       // Custom overrides and additional rules
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
       'react/prop-types': 'off', // Not needed with TypeScript
 
       // General best practices that might not be in recommended

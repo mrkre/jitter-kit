@@ -1,0 +1,133 @@
+# Task ID: 9
+# Title: Address Technical Debt and Code Quality Issues
+# Status: pending
+# Dependencies: 1, 2, 3, 4, 5, 6, 7, 8
+# Priority: medium
+# Description: Identify and resolve technical debt, code quality issues, bugs, performance bottlenecks, and security vulnerabilities across the application to improve maintainability and stability.
+# Details:
+This task involves a comprehensive review and improvement of the codebase:
+
+1. Code Quality Assessment:
+   - Run static code analysis tools (ESLint, SonarQube) to identify code smells and anti-patterns
+   - Review component structure for adherence to React best practices
+   - Check for proper TypeScript typing throughout the codebase
+   - Identify areas with insufficient test coverage
+
+2. Performance Optimization:
+   - Profile the application to identify rendering bottlenecks
+   - Optimize p5.js rendering performance, especially for complex patterns
+   - Review and optimize React component re-rendering
+   - Implement memoization where appropriate for expensive calculations
+   - Check for memory leaks, particularly in the animation loop
+
+3. Bug Fixes:
+   - Review and address all open issues in the issue tracker
+   - Focus on edge cases in the jitter engine calculations
+   - Fix any browser compatibility issues
+   - Address responsive design breakpoints
+
+4. Security Enhancements:
+   - Audit dependencies for vulnerabilities
+   - Implement proper input validation for all user inputs
+   - Review export functionality for potential security issues
+   - Ensure proper error handling throughout the application
+
+5. Refactoring:
+   - Improve code organization and modularity
+   - Extract reusable logic into custom hooks or utility functions
+   - Standardize naming conventions across the codebase
+   - Improve documentation with JSDoc comments
+
+This task will serve as a parent task for specific subtasks targeting individual areas of improvement.
+
+# Test Strategy:
+1. Code Quality Verification:
+   - Run automated linting and type checking with zero errors/warnings
+   - Conduct peer code reviews for all changes
+   - Verify test coverage metrics meet or exceed 80%
+   - Document before/after metrics for code quality
+
+2. Performance Testing:
+   - Use Chrome DevTools Performance tab to measure and compare rendering times before and after
+   - Create performance benchmarks for the jitter engine with various parameter combinations
+   - Test memory usage during extended animation periods
+   - Verify smooth performance on lower-end devices
+
+3. Bug Verification:
+   - Create regression test cases for each fixed bug
+   - Verify fixes across all supported browsers
+   - Test edge cases with extreme parameter values
+   - Ensure responsive design works at all breakpoints
+
+4. Security Testing:
+   - Run dependency vulnerability scans (npm audit)
+   - Perform penetration testing on user input fields
+   - Verify secure handling of file exports
+   - Test error handling with unexpected inputs
+
+5. Documentation Review:
+   - Verify updated documentation accurately reflects code changes
+   - Ensure all public functions and components have proper JSDoc comments
+   - Update README with any new development guidelines
+
+# Subtasks:
+## 1. Fix Missing WelcomeVisibilityContext Provider [pending]
+### Dependencies: None
+### Description: The WelcomeVisibilityContext at components/WelcomeVisibilityContext.tsx is defined but has no provider, which will cause runtime errors as it's used in AppShell.tsx.
+### Details:
+Impact: Runtime crash when trying to use the context. Fix: Add a proper provider component for the context and wrap the application with it to ensure the context is available to all consumer components.
+
+## 2. Address Potential P5.js Memory Leak [pending]
+### Dependencies: None
+### Description: There is a potential memory leak in `components/P5Sketch.tsx` because the p5.js instance cleanup may not be complete.
+### Details:
+Impact: Memory leaks on component unmount/remount. Fix: Review the useEffect cleanup function in the P5Sketch component. Ensure `p5InstanceRef.current.remove()` completely disposes of all p5 resources, including sketches and event listeners, to prevent memory leaks.
+
+## 3. Fix Cross-Browser Fullscreen API Typing and Implementation [pending]
+### Dependencies: None
+### Description: The `Canvas.tsx` component is missing type declarations for vendor-prefixed fullscreen methods like `webkitRequestFullscreen`.
+### Details:
+Impact: TypeScript errors and potential runtime issues on different browsers. Fix: Add ambient type declarations for the prefixed fullscreen methods to the `HTMLDivElement` interface or, preferably, integrate a well-maintained library that abstracts away browser inconsistencies for handling fullscreen requests.
+
+## 4. Improve Cookie Parsing in useWelcomeVisibility Hook [pending]
+### Dependencies: None
+### Description: The cookie parsing logic in `hooks/useWelcomeVisibility.ts` is naive and could fail with malformed cookies.
+### Details:
+Impact: Potential for runtime errors if the `document.cookie` string is malformed. Fix: Refactor the cookie parsing logic to be more robust. Use a try-catch block or a more sophisticated parsing method to gracefully handle errors and prevent the application from crashing due to unexpected cookie formats.
+
+## 5. Review and Align Home Page Export Convention [pending]
+### Dependencies: None
+### Description: The use of a default export in `app/page.tsx` appears to violate the project's standard of using named exports.
+### Details:
+Impact: Inconsistent with project standards outlined in documentation. Fix: Review the project's export conventions. While most components should use named exports, Next.js requires page components in the App Router to be default exports. Confirm this exception is acceptable and document it, or refactor the component if it's not intended to be a page.
+
+## 6. Apply React.memo for Performance Optimization [pending]
+### Dependencies: None
+### Description: Large components like `UnifiedControlPanel` and `P5Sketch` may be re-rendering unnecessarily, impacting performance.
+### Details:
+Recommendation: Wrap `UnifiedControlPanel` and `P5Sketch` with `React.memo` to prevent re-renders when their props have not changed. Profile the components before and after applying the memoization to verify a positive impact on performance.
+
+## 7. Optimize Event Listeners in Canvas Component [pending]
+### Dependencies: None
+### Description: The `Canvas.tsx` component adds multiple `keydown` event listeners, which could be consolidated.
+### Details:
+Recommendation: Refactor the event handling in `Canvas.tsx`. Instead of multiple `addEventListener` calls, use a single event delegation pattern on a parent element or consolidate the logic into a single `handleKeyDown` function that manages different key presses. This will improve performance and maintainability.
+
+## 8. Enhance Cookie Security Attributes [pending]
+### Dependencies: None
+### Description: The cookie set in `hooks/useWelcomeVisibility.ts` lacks important security attributes.
+### Details:
+Fix: Update the `document.cookie` assignment in `hooks/useWelcomeVisibility.ts` to include the `SameSite=Strict` and `Secure` attributes. The `Secure` flag should only be applied in a production environment (e.g., by checking `process.env.NODE_ENV === 'production'`). This will help mitigate CSRF and other cookie-based attacks.
+
+## 9. Implement Error Boundaries for Critical Components [pending]
+### Dependencies: None
+### Description: The application lacks error boundaries, meaning a crash in a component like the P5.js sketch could take down the entire app.
+### Details:
+Fix: Create a reusable `ErrorBoundary` component that catches JavaScript errors in its child component tree, logs those errors, and displays a fallback UI. Wrap critical components, especially `P5Sketch` and other dynamic parts of the application, with this `ErrorBoundary` to improve resilience and prevent catastrophic failures.
+
+## 10. Implement Canvas Resizing on Fullscreen Change [pending]
+### Dependencies: None
+### Description: The canvas does not properly resize when toggling fullscreen mode, leading to distorted rendering and incorrect dimensions.
+### Details:
+Implement an event listener for the `fullscreenchange` event on the canvas container. When the event fires, the handler should get the new dimensions of the container and call the p5.js `resizeCanvas()` function with the new width and height. This will ensure the canvas correctly fills the screen when entering fullscreen and returns to its original size when exiting.
+
