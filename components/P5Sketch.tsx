@@ -152,9 +152,9 @@ export default function P5Sketch({
             algorithm:
               localParams.algorithm as Layer['parameters']['algorithm'],
             density: localParams.density || 10,
-            gutter: 5,
+            gutter: localParams.gutter || 5,
             colorPalette: [localParams.selectedColor || 'purple'],
-            scale: localParams.noiseScale || 0.02,
+            scale: localParams.noiseScale || 0.005,
             depth: localParams.iterations || localParams.octaves || 6, // L-Systems uses iterations for depth
             particleCount: localParams.particleCount || 100,
             rule:
@@ -164,23 +164,26 @@ export default function P5Sketch({
             subdivisions: localParams.subdivisions || 3,
             threshold: localParams.threshold || 0.5,
             perspective: localParams.perspective || 0.5,
-            shapeVariety: localParams.shapeVariety || 3,
+            shapeVariety: localParams.shapeVariety || 1,
             heightVariation: localParams.heightVariation || 2,
             sizeVariation: localParams.sizeVariation || 3,
             displacementIntensity: localParams.displacementIntensity || 1,
             colorVariation: localParams.colorVariation || 3,
+            noiseScale: localParams.noiseScale || 0.005,
+            octaves: localParams.octaves || 4,
             fieldStrength: localParams.fieldStrength || 1,
             flowSpeed: localParams.flowSpeed || 0.01,
-            branchLength: localParams.branchLength || 0.6,
+            branchLength: localParams.branchLength || 0.7,
             treeCount: localParams.treeCount || 8,
-            iterations: localParams.iterations || 5,
+            iterations: localParams.iterations || 6,
             gravity: localParams.gravity || 0.2,
             friction: localParams.friction || 0.95,
             generations: localParams.generations || 10,
             survivalRules: localParams.survivalRules || '23/3',
+            pattern: localParams.pattern || 'koch', // L-Systems pattern
             axiom: localParams.axiom || 'F', // L-Systems axiom
             rules: localParams.rules || 'F=F+F-F-F+F', // L-Systems rules
-            turnAngle: localParams.angle || 90, // L-Systems turn angle
+            turnAngle: localParams.angle || 25, // L-Systems turn angle
             // Pass canvas dimensions to algorithms
             canvasWidth,
             canvasHeight,

@@ -92,6 +92,7 @@ export interface Layer {
     generations?: number
     survivalRules?: string
     // L-System specific
+    pattern?: string
     axiom?: string
     rules?: string
     turnAngle?: number

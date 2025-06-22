@@ -1,6 +1,12 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from 'react'
 
 interface Layer {
   id: string
@@ -12,6 +18,13 @@ interface Layer {
 interface AlgorithmParams {
   // Common parameters
   density: number
+  gutter?: number
+  // Visual variation parameters
+  shapeVariety?: number
+  sizeVariation?: number
+  displacementIntensity?: number
+  colorVariation?: number
+  heightVariation?: number
   // Noise specific
   noiseScale?: number
   octaves?: number
@@ -36,6 +49,7 @@ interface AlgorithmParams {
   generations?: number
   survivalRules?: string
   // L-System specific
+  pattern?: string
   axiom?: string
   rules?: string
   angle?: number
@@ -74,11 +88,18 @@ export function JitterProvider({ children }: JitterProviderProps) {
     algorithm: 'uniform',
     animationType: 'none',
     duration: 2,
+    // Common visual parameters
+    gutter: 5,
+    shapeVariety: 1,
+    sizeVariation: 3,
+    displacementIntensity: 1,
+    colorVariation: 3,
+    heightVariation: 2,
     // Perlin specific
     fieldStrength: 1,
     flowSpeed: 0.01,
     // Noise specific
-    noiseScale: 0.02,
+    noiseScale: 0.005,
     octaves: 4,
     // Recursive specific
     subdivisions: 3,
@@ -98,6 +119,7 @@ export function JitterProvider({ children }: JitterProviderProps) {
     generations: 10,
     survivalRules: '23/3',
     // L-System specific
+    pattern: 'koch',
     axiom: 'F',
     rules: 'F=F+F-F-F+F',
     angle: 25,
@@ -106,9 +128,9 @@ export function JitterProvider({ children }: JitterProviderProps) {
   const [layers, setLayers] = useState<Layer[]>([])
   const [selectedLayer, setSelectedLayer] = useState<string | null>(null)
 
-  const updateParams = (updates: Partial<JitterParams>) => {
+  const updateParams = useCallback((updates: Partial<JitterParams>) => {
     setParams((prev) => ({ ...prev, ...updates }))
-  }
+  }, [])
 
   const addLayer = () => {
     const newLayer: Layer = {
