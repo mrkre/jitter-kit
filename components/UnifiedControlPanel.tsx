@@ -1,7 +1,18 @@
 'use client'
 
-import { ChevronDown, Plus, Eye, Lock } from 'lucide-react'
 import { useState } from 'react'
+
+import {
+  ChevronDown,
+  Plus,
+  Eye,
+  Lock,
+  Layers,
+  SlidersHorizontal,
+  Play,
+  Download,
+} from 'lucide-react'
+
 import {
   Accordion,
   AccordionItem,
@@ -63,18 +74,29 @@ export default function UnifiedControlPanel({
 
       {/* Main Content Area with Sections */}
       <div className="flex-1 overflow-y-auto">
-        <Accordion defaultExpanded={['layers', 'parameters', 'export']}>
+        <Accordion
+          key={isCollapsed ? 'collapsed' : 'expanded'}
+          allowMultiple
+          defaultExpanded={
+            isCollapsed ? [] : ['layers', 'parameters', 'export']
+          }
+        >
           {/* Layer Management Section */}
           <AccordionItem>
-            <AccordionTrigger id="layers">
-              <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                Layers
-              </h3>
-            </AccordionTrigger>
-            <AccordionContent
+            <AccordionTrigger
               id="layers"
-              className={isCollapsed ? 'hidden' : ''}
+              className={isCollapsed ? 'justify-center' : ''}
+              icon={isCollapsed ? <></> : undefined}
             >
+              {isCollapsed ? (
+                <Layers className="h-5 w-5 text-gray-500" />
+              ) : (
+                <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                  Layers
+                </h3>
+              )}
+            </AccordionTrigger>
+            <AccordionContent id="layers">
               <div className="space-y-2">
                 <Button
                   variant="outline"
@@ -121,15 +143,20 @@ export default function UnifiedControlPanel({
 
           {/* Parameter Controls Section */}
           <AccordionItem>
-            <AccordionTrigger id="parameters">
-              <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                Parameters
-              </h3>
-            </AccordionTrigger>
-            <AccordionContent
+            <AccordionTrigger
               id="parameters"
-              className={isCollapsed ? 'hidden' : ''}
+              className={isCollapsed ? 'justify-center' : ''}
+              icon={isCollapsed ? <></> : undefined}
             >
+              {isCollapsed ? (
+                <SlidersHorizontal className="h-5 w-5 text-gray-500" />
+              ) : (
+                <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                  Parameters
+                </h3>
+              )}
+            </AccordionTrigger>
+            <AccordionContent id="parameters">
               <div className="space-y-4">
                 <Select
                   label="Algorithm"
@@ -168,15 +195,20 @@ export default function UnifiedControlPanel({
 
           {/* Animation Controls Section */}
           <AccordionItem>
-            <AccordionTrigger id="animation">
-              <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                Animation
-              </h3>
-            </AccordionTrigger>
-            <AccordionContent
+            <AccordionTrigger
               id="animation"
-              className={isCollapsed ? 'hidden' : ''}
+              className={isCollapsed ? 'justify-center' : ''}
+              icon={isCollapsed ? <></> : undefined}
             >
+              {isCollapsed ? (
+                <Play className="h-5 w-5 text-gray-500" />
+              ) : (
+                <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                  Animation
+                </h3>
+              )}
+            </AccordionTrigger>
+            <AccordionContent id="animation">
               <div className="space-y-4">
                 <Select
                   label="Animation Type"
@@ -212,15 +244,20 @@ export default function UnifiedControlPanel({
 
           {/* Export Options Section */}
           <AccordionItem>
-            <AccordionTrigger id="export">
-              <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
-                Export
-              </h3>
-            </AccordionTrigger>
-            <AccordionContent
+            <AccordionTrigger
               id="export"
-              className={isCollapsed ? 'hidden' : ''}
+              className={isCollapsed ? 'justify-center' : ''}
+              icon={isCollapsed ? <></> : undefined}
             >
+              {isCollapsed ? (
+                <Download className="h-5 w-5 text-gray-500" />
+              ) : (
+                <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                  Export
+                </h3>
+              )}
+            </AccordionTrigger>
+            <AccordionContent id="export">
               <div className="space-y-3">
                 <Button variant="primary" fullWidth>
                   Export as SVG
@@ -239,7 +276,7 @@ export default function UnifiedControlPanel({
 
       {/* Footer */}
       <div
-        className={`border-t border-gray-800 p-4 ${isCollapsed ? 'hidden' : 'block'}`}
+        className={`border-t border-gray-200/80 p-4 ${isCollapsed ? 'hidden' : 'block'}`}
       >
         <div className="text-xs text-gray-500">jitter-kit v1.0.0</div>
       </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+
 import '@/styles/globals.css'
+
 import AppShell from '@/components/AppShell'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 
