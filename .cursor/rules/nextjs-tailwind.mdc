@@ -146,6 +146,45 @@ export function Card({ isActive, isDisabled }) {
 | `overflow-ellipsis`     | `text-ellipsis`                           |
 | `decoration-clone`      | `box-decoration-clone`                    |
 
+## Import Order Convention
+
+### Required Import Order
+Follow this exact order for all TypeScript/React files:
+
+1. **React and Next.js imports**
+2. **Third-party library imports** 
+3. **Internal imports (components, utilities, etc.)**
+4. **Type-only imports** (with `type` keyword)
+
+```tsx
+// ✅ Correct import order
+import { useState } from 'react'
+import { NextPage } from 'next'
+
+import { clsx } from 'clsx'
+import { Button } from 'lucide-react'
+
+import { CustomButton } from '@/components/ui/Button'
+import { formatDate } from '@/lib/utils'
+
+import type { User } from '@/types/User.types'
+
+// Component implementation
+```
+
+```tsx
+// ❌ Incorrect - mixed order
+import { Button } from 'lucide-react'
+import { useState } from 'react'
+import { CustomButton } from '@/components/ui/Button'
+import type { User } from '@/types/User.types'
+```
+
+### Spacing Rules
+- Add blank lines between import groups
+- No blank lines within import groups
+- One blank line after all imports before component code
+
 ## TypeScript Guidelines
 
 ### Type Safety
