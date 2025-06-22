@@ -29,6 +29,9 @@ Modern Next.js 15+ application built with TypeScript, ESLint 9, Prettier, and co
 
 ## Development Guidelines
 
+- Lint check using: `pnpm lint:check`
+- Lint fix using `pnpm lint`
+
 ### Component Conventions
 
 - Use functional components with TypeScript
@@ -40,7 +43,7 @@ Modern Next.js 15+ application built with TypeScript, ESLint 9, Prettier, and co
 
 ### Canvas and P5.js Rules (CRITICAL)
 
-**⚠️ NEVER create multiple Canvas or P5.js instances**
+! ⚠️ NEVER create multiple Canvas or P5.js instances
 
 - **ONE Canvas component per application** - Only render `<Canvas />` once in the entire component tree
 - **Stable Canvas mounting** - Always use a stable `key` prop on Canvas to prevent re-mounting
@@ -64,6 +67,7 @@ Modern Next.js 15+ application built with TypeScript, ESLint 9, Prettier, and co
 ```
 
 **P5.js Component Rules:**
+
 - Always cleanup existing P5 instances before creating new ones
 - Use empty dependency array `[]` for P5 instance creation useEffect
 - Implement proper ResizeObserver cleanup
@@ -156,6 +160,7 @@ export function P5Sketch({ params, selectedLayer }: { params: any; selectedLayer
 ```
 
 **⚠️ CRITICAL Canvas Patterns:**
+
 - **Stable Keys**: `key="main-canvas"` should NEVER change during layer add/select operations
 - **Layer-Aware Updates**: Use `updateWithProps` for layer changes, not component re-mounting
 - **Persist State**: Canvas survives layer additions, deletions, and selections
@@ -180,17 +185,21 @@ export function Button({ variant = 'primary', size = 'md', children }: ButtonPro
 ```
 
 #### Export Patterns
+
 **✅ Correct - Named Export:**
+
 ```typescript
 export function MyComponent() { /* ... */ }
 ```
 
 **❌ Incorrect - Default Export:**
+
 ```typescript
 export default function MyComponent() { /* ... */ }
 ```
 
 #### Client-Only Libraries
+
 For libraries that don't support SSR (like P5.js, Chart.js, etc.):
 
 ```typescript
@@ -204,6 +213,7 @@ const P5Sketch = dynamic(() => import('./P5Sketch'), {
 ```
 
 #### Component Index Files
+
 Create index files for easy importing:
 
 ```typescript

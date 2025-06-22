@@ -5,6 +5,7 @@ import '@/styles/globals.css'
 
 import AppShell from '@/components/AppShell'
 import { ToastProvider } from '@/components/ui/ToastProvider'
+import { version } from '../package.json'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ToastProvider>
-          <AppShell>{children}</AppShell>
+          <AppShell version={version}>{children}</AppShell>
         </ToastProvider>
       </body>
     </html>

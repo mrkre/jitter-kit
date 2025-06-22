@@ -6,7 +6,9 @@ import {
   ChevronDown,
   Plus,
   Eye,
+  EyeOff,
   Lock,
+  Unlock,
   Layers,
   SlidersHorizontal,
   Play,
@@ -27,19 +29,34 @@ import {
   Spinner,
 } from './ui'
 import { useJitter } from './JitterContext'
+import {
+  getParametersForAlgorithm,
+  getDefaultParamsForAlgorithm,
+} from '../lib/algorithmConfig'
 
 interface UnifiedControlPanelProps {
+  version: string
   isCollapsed?: boolean
   onToggleCollapse?: () => void
   isMobile?: boolean
 }
 
-export default function UnifiedControlPanel({
+export function UnifiedControlPanel({
+  version,
   isCollapsed = false,
   onToggleCollapse,
   isMobile = false,
 }: UnifiedControlPanelProps) {
-  const { params, updateParams } = useJitter()
+  const {
+    params,
+    updateParams,
+    layers,
+    selectedLayer,
+    addLayer,
+    selectLayer,
+    toggleLayerVisibility,
+    toggleLayerLock,
+  } = useJitter()
   const [exportLoading, setExportLoading] = useState<string | null>(null)
 
   const handleExport = async (type: 'svg' | 'gsap' | 'project') => {
@@ -55,6 +72,72 @@ export default function UnifiedControlPanel({
       console.error('Export failed:', error)
     } finally {
       setExportLoading(null)
+    }
+  }
+
+  const handleAlgorithmChange = (algorithm: string) => {
+    // Get default parameters for the new algorithm
+    const defaultParams = getDefaultParamsForAlgorithm(algorithm)
+
+    // Update parameters with new algorithm and its defaults
+    updateParams({
+      algorithm,
+      ...defaultParams,
+    })
+  }
+
+  const currentAlgorithmParams = getParametersForAlgorithm(params.algorithm)
+
+  const renderParameter = (paramConfig: any) => {
+    const { key, label, type, min, max, step, options, formatValue } =
+      paramConfig
+    const value = params[key as keyof typeof params]
+
+    switch (type) {
+      case 'slider':
+        return (
+          <Slider
+            key={key}
+            label={label}
+            value={Number(value) || paramConfig.defaultValue}
+            onChange={(newValue) => updateParams({ [key]: newValue })}
+            min={min}
+            max={max}
+            step={step}
+            showValue
+            formatValue={formatValue}
+          />
+        )
+
+      case 'select':
+        return (
+          <Select
+            key={key}
+            label={label}
+            options={options || []}
+            value={String(value) || String(paramConfig.defaultValue)}
+            onChange={(e) => updateParams({ [key]: e.target.value })}
+            fullWidth
+          />
+        )
+
+      case 'text':
+        return (
+          <div key={key}>
+            <label className="mb-1.5 block text-xs font-medium text-gray-500">
+              {label}
+            </label>
+            <input
+              type="text"
+              value={String(value) || String(paramConfig.defaultValue)}
+              onChange={(e) => updateParams({ [key]: e.target.value })}
+              className="w-full rounded-md border border-gray-200/80 bg-white/80 px-3 py-2 text-sm transition-colors hover:border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+          </div>
+        )
+
+      default:
+        return null
     }
   }
 
@@ -120,38 +203,70 @@ export default function UnifiedControlPanel({
                   icon={Plus}
                   iconPosition="left"
                   size="sm"
+                  onClick={addLayer}
                 >
                   Add Layer
                 </Button>
 
-                {/* Placeholder Layer Items */}
+                {/* Layer Items */}
                 <div className="space-y-2 pt-2">
-                  <div className="rounded-md border border-transparent bg-gray-50/80 p-2 hover:border-gray-200/80">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Layer 1</span>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          aria-label="Toggle visibility"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          aria-label="Lock layer"
-                        >
-                          <Lock className="h-4 w-4" />
-                        </Button>
+                  {layers.length > 0 ? (
+                    layers.map((layer) => (
+                      <div
+                        key={layer.id}
+                        className={`cursor-pointer rounded-md border p-2 transition-colors ${
+                          selectedLayer === layer.id
+                            ? 'border-blue-200 bg-blue-50/80'
+                            : 'border-transparent bg-gray-50/80 hover:border-gray-200/80'
+                        }`}
+                        onClick={() => selectLayer(layer.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-700">
+                            {layer.name}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                toggleLayerVisibility(layer.id)
+                              }}
+                              aria-label="Toggle visibility"
+                            >
+                              {layer.visible ? (
+                                <Eye className="h-4 w-4" />
+                              ) : (
+                                <EyeOff className="h-4 w-4 text-gray-400" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                toggleLayerLock(layer.id)
+                              }}
+                              aria-label="Lock layer"
+                            >
+                              {layer.locked ? (
+                                <Lock className="h-4 w-4 text-gray-400" />
+                              ) : (
+                                <Unlock className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="py-2 text-center text-sm text-gray-500">
+                      No layers yet
                     </div>
-                  </div>
-                  <div className="py-2 text-center text-sm text-gray-500">
-                    No layers yet
-                  </div>
+                  )}
                 </div>
               </div>
             </AccordionContent>
@@ -173,41 +288,47 @@ export default function UnifiedControlPanel({
               )}
             </AccordionTrigger>
             <AccordionContent id="parameters">
-              <div className="space-y-4">
-                <Select
-                  label="Algorithm"
-                  options={selectPresets.algorithms}
-                  defaultValue="uniform"
-                  fullWidth
-                />
-
-                <Slider
-                  label="Density"
-                  value={params.density}
-                  onChange={(value) => updateParams({ density: value })}
-                  min={1}
-                  max={50}
-                  step={1}
-                  showValue
-                />
-
-                <div>
-                  <label className="mb-2 block text-xs font-medium text-gray-500">
-                    Colors
-                  </label>
-                  <ColorPicker
-                    selectedColorId={params.selectedColor}
-                    onColorSelect={(color) =>
-                      updateParams({ selectedColor: color })
-                    }
-                    onColorAdd={(_color) => {
-                      // TODO: Implement color adding logic
-                      // eslint-disable-next-line no-console
-                      console.log('color added', _color)
-                    }}
+              {selectedLayer ? (
+                <div className="space-y-4">
+                  <Select
+                    label="Algorithm"
+                    options={selectPresets.algorithms}
+                    value={params.algorithm}
+                    onChange={(e) => handleAlgorithmChange(e.target.value)}
+                    fullWidth
                   />
+
+                  {/* Dynamic algorithm-specific parameters */}
+                  {currentAlgorithmParams.map(renderParameter)}
+
+                  <div>
+                    <label className="mb-2 block text-xs font-medium text-gray-500">
+                      Colors
+                    </label>
+                    <ColorPicker
+                      selectedColorId={params.selectedColor}
+                      onColorSelect={(color) =>
+                        updateParams({ selectedColor: color })
+                      }
+                      onColorAdd={(_color) => {
+                        // TODO: Implement color adding logic
+                        // eslint-disable-next-line no-console
+                        console.log('color added', _color)
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center">
+                  <SlidersHorizontal className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+                  <p className="mb-1 text-sm text-gray-500">
+                    No layer selected
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Select a layer to edit its parameters
+                  </p>
+                </div>
+              )}
             </AccordionContent>
           </AccordionItem>
 
@@ -227,36 +348,48 @@ export default function UnifiedControlPanel({
               )}
             </AccordionTrigger>
             <AccordionContent id="animation">
-              <div className="space-y-4">
-                <Select
-                  label="Animation Type"
-                  options={selectPresets.animations}
-                  defaultValue="none"
-                  fullWidth
-                />
+              {selectedLayer ? (
+                <div className="space-y-4">
+                  <Select
+                    label="Animation Type"
+                    options={selectPresets.animations}
+                    defaultValue="none"
+                    fullWidth
+                  />
 
-                <Slider
-                  label="Speed"
-                  value={params.speed}
-                  onChange={(value) => updateParams({ speed: value })}
-                  min={0.1}
-                  max={5}
-                  step={0.1}
-                  showValue
-                  formatValue={sliderFormatters.decimal(1)}
-                />
+                  <Slider
+                    label="Speed"
+                    value={params.speed}
+                    onChange={(value) => updateParams({ speed: value })}
+                    min={0.1}
+                    max={5}
+                    step={0.1}
+                    showValue
+                    formatValue={sliderFormatters.decimal(1)}
+                  />
 
-                <Slider
-                  label="Duration"
-                  value={params.duration}
-                  onChange={(value) => updateParams({ duration: value })}
-                  min={0.5}
-                  max={10}
-                  step={0.5}
-                  showValue
-                  formatValue={sliderFormatters.seconds}
-                />
-              </div>
+                  <Slider
+                    label="Duration"
+                    value={params.duration}
+                    onChange={(value) => updateParams({ duration: value })}
+                    min={0.5}
+                    max={10}
+                    step={0.5}
+                    showValue
+                    formatValue={sliderFormatters.seconds}
+                  />
+                </div>
+              ) : (
+                <div className="py-8 text-center">
+                  <Play className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+                  <p className="mb-1 text-sm text-gray-500">
+                    No layer selected
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Select a layer to configure animations
+                  </p>
+                </div>
+              )}
             </AccordionContent>
           </AccordionItem>
 
@@ -332,7 +465,7 @@ export default function UnifiedControlPanel({
       <div
         className={`border-t border-gray-200/80 p-4 ${isCollapsed ? 'hidden' : 'block'}`}
       >
-        <div className="text-xs text-gray-500">jitter-kit v1.0.0</div>
+        <div className="text-xs text-gray-500">jitter-kit v{version}</div>
       </div>
     </aside>
   )

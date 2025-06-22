@@ -85,7 +85,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
 
           <div className="relative">
             {/* Track */}
-            <div className="absolute inset-0 h-2 rounded-full bg-gray-200">
+            <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gray-200">
               {/* Filled track */}
               <div
                 className="absolute h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"

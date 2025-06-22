@@ -1,0 +1,373 @@
+interface ParameterConfig {
+  key: string
+  label: string
+  type: 'slider' | 'select' | 'text'
+  min?: number
+  max?: number
+  step?: number
+  options?: { value: string; label: string }[]
+  defaultValue: number | string
+  formatValue?: (value: number) => string
+}
+
+export const algorithmParameters: Record<string, ParameterConfig[]> = {
+  uniform: [
+    {
+      key: 'density',
+      label: 'Grid Density',
+      type: 'slider',
+      min: 1,
+      max: 50,
+      step: 1,
+      defaultValue: 10,
+    },
+    {
+      key: 'shapeVariety',
+      label: 'Shape Variety',
+      type: 'slider',
+      min: 0,
+      max: 8,
+      step: 1,
+      defaultValue: 2,
+    },
+    {
+      key: 'sizeVariation',
+      label: 'Size Variation',
+      type: 'slider',
+      min: 0,
+      max: 10,
+      step: 1,
+      defaultValue: 3,
+    },
+  ],
+
+  noise: [
+    {
+      key: 'density',
+      label: 'Grid Density',
+      type: 'slider',
+      min: 1,
+      max: 50,
+      step: 1,
+      defaultValue: 15,
+    },
+    {
+      key: 'noiseScale',
+      label: 'Noise Scale',
+      type: 'slider',
+      min: 0.001,
+      max: 0.1,
+      step: 0.001,
+      defaultValue: 0.01,
+      formatValue: (value) => `${(value * 1000).toFixed(0)}‰`,
+    },
+    {
+      key: 'octaves',
+      label: 'Octaves',
+      type: 'slider',
+      min: 1,
+      max: 8,
+      step: 1,
+      defaultValue: 4,
+    },
+    {
+      key: 'shapeVariety',
+      label: 'Shape Variety',
+      type: 'slider',
+      min: 0,
+      max: 6,
+      step: 1,
+      defaultValue: 2,
+    },
+    {
+      key: 'displacementIntensity',
+      label: 'Displacement Intensity',
+      type: 'slider',
+      min: 0.1,
+      max: 3,
+      step: 0.1,
+      defaultValue: 1,
+      formatValue: (value) => `${value.toFixed(1)}x`,
+    },
+  ],
+
+  recursive: [
+    {
+      key: 'density',
+      label: 'Initial Density',
+      type: 'slider',
+      min: 1,
+      max: 20,
+      step: 1,
+      defaultValue: 5,
+    },
+    {
+      key: 'subdivisions',
+      label: 'Subdivisions',
+      type: 'slider',
+      min: 1,
+      max: 12,
+      step: 1,
+      defaultValue: 4,
+    },
+    {
+      key: 'threshold',
+      label: 'Split Threshold',
+      type: 'slider',
+      min: 0,
+      max: 1,
+      step: 0.1,
+      defaultValue: 0.5,
+      formatValue: (value) => `${Math.round(value * 100)}%`,
+    },
+    {
+      key: 'shapeVariety',
+      label: 'Shape Variety',
+      type: 'slider',
+      min: 0,
+      max: 5,
+      step: 1,
+      defaultValue: 1,
+    },
+    {
+      key: 'colorVariation',
+      label: 'Color Variation',
+      type: 'slider',
+      min: 0,
+      max: 10,
+      step: 1,
+      defaultValue: 3,
+    },
+  ],
+
+  isometric: [
+    {
+      key: 'density',
+      label: 'Grid Density',
+      type: 'slider',
+      min: 1,
+      max: 30,
+      step: 1,
+      defaultValue: 12,
+    },
+    {
+      key: 'perspective',
+      label: 'Perspective',
+      type: 'slider',
+      min: 0,
+      max: 2,
+      step: 0.1,
+      defaultValue: 0.5,
+      formatValue: (value) => `${value.toFixed(1)}`,
+    },
+    {
+      key: 'shapeVariety',
+      label: 'Shape Variety',
+      type: 'slider',
+      min: 0,
+      max: 10,
+      step: 1,
+      defaultValue: 3,
+    },
+    {
+      key: 'heightVariation',
+      label: 'Height Variation',
+      type: 'slider',
+      min: 0,
+      max: 10,
+      step: 1,
+      defaultValue: 2,
+    },
+  ],
+
+  perlin: [
+    {
+      key: 'density',
+      label: 'Field Resolution',
+      type: 'slider',
+      min: 5,
+      max: 100,
+      step: 5,
+      defaultValue: 20,
+    },
+    {
+      key: 'fieldStrength',
+      label: 'Field Strength',
+      type: 'slider',
+      min: 0.1,
+      max: 5,
+      step: 0.1,
+      defaultValue: 1,
+      formatValue: (value) => `${value.toFixed(1)}x`,
+    },
+    {
+      key: 'flowSpeed',
+      label: 'Flow Speed',
+      type: 'slider',
+      min: 0.001,
+      max: 0.05,
+      step: 0.001,
+      defaultValue: 0.01,
+      formatValue: (value) => `${(value * 1000).toFixed(0)}‰`,
+    },
+  ],
+
+  fractal: [
+    {
+      key: 'treeCount',
+      label: 'Number of Trees',
+      type: 'slider',
+      min: 1,
+      max: 50,
+      step: 1,
+      defaultValue: 8,
+    },
+    {
+      key: 'iterations',
+      label: 'Iterations',
+      type: 'slider',
+      min: 1,
+      max: 8,
+      step: 1,
+      defaultValue: 5,
+    },
+    {
+      key: 'branchAngle',
+      label: 'Branch Angle',
+      type: 'slider',
+      min: 5,
+      max: 90,
+      step: 5,
+      defaultValue: 30,
+      formatValue: (value) => `${value}°`,
+    },
+    {
+      key: 'branchLength',
+      label: 'Branch Length',
+      type: 'slider',
+      min: 0.3,
+      max: 0.8,
+      step: 0.05,
+      defaultValue: 0.6,
+      formatValue: (value) => `${Math.round(value * 100)}%`,
+    },
+  ],
+
+  particles: [
+    {
+      key: 'particleCount',
+      label: 'Particle Count',
+      type: 'slider',
+      min: 10,
+      max: 1000,
+      step: 10,
+      defaultValue: 200,
+    },
+    {
+      key: 'gravity',
+      label: 'Gravity',
+      type: 'slider',
+      min: -2,
+      max: 2,
+      step: 0.1,
+      defaultValue: 0.2,
+      formatValue: (value) => `${value.toFixed(1)}`,
+    },
+    {
+      key: 'friction',
+      label: 'Friction',
+      type: 'slider',
+      min: 0.8,
+      max: 1,
+      step: 0.01,
+      defaultValue: 0.95,
+      formatValue: (value) => `${Math.round(value * 100)}%`,
+    },
+  ],
+
+  cellular: [
+    {
+      key: 'density',
+      label: 'Grid Size',
+      type: 'slider',
+      min: 10,
+      max: 100,
+      step: 5,
+      defaultValue: 40,
+    },
+    {
+      key: 'generations',
+      label: 'Generations',
+      type: 'slider',
+      min: 1,
+      max: 50,
+      step: 1,
+      defaultValue: 10,
+    },
+    {
+      key: 'survivalRules',
+      label: 'Survival Rules',
+      type: 'select',
+      options: [
+        { value: '23/3', label: "Conway's Life (23/3)" },
+        { value: '125/36', label: 'Maze (125/36)' },
+        { value: '1357/1357', label: 'Replicator (1357/1357)' },
+        { value: '02468/1357', label: 'Fredkin (02468/1357)' },
+      ],
+      defaultValue: '23/3',
+    },
+  ],
+
+  lsystem: [
+    {
+      key: 'iterations',
+      label: 'Iterations',
+      type: 'slider',
+      min: 1,
+      max: 8,
+      step: 1,
+      defaultValue: 4,
+    },
+    {
+      key: 'angle',
+      label: 'Turn Angle',
+      type: 'slider',
+      min: 15,
+      max: 180,
+      step: 15,
+      defaultValue: 90,
+      formatValue: (value) => `${value}°`,
+    },
+    {
+      key: 'axiom',
+      label: 'Axiom',
+      type: 'text',
+      defaultValue: 'F',
+    },
+    {
+      key: 'rules',
+      label: 'Rules',
+      type: 'text',
+      defaultValue: 'F=F+F-F-F+F',
+    },
+  ],
+}
+
+export function getParametersForAlgorithm(
+  algorithm: string
+): ParameterConfig[] {
+  return algorithmParameters[algorithm] || algorithmParameters.uniform
+}
+
+export function getDefaultParamsForAlgorithm(
+  algorithm: string
+): Record<string, any> {
+  const params = getParametersForAlgorithm(algorithm)
+  const defaults: Record<string, any> = {}
+
+  params.forEach((param) => {
+    defaults[param.key] = param.defaultValue
+  })
+
+  return defaults
+}

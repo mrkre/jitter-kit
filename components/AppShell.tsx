@@ -3,16 +3,17 @@
 import React, { useState, useEffect, useCallback } from 'react'
 
 import Header from './Header'
-import UnifiedControlPanel from './UnifiedControlPanel'
+import { UnifiedControlPanel } from './UnifiedControlPanel'
 import { JitterProvider } from './JitterContext'
 import { useWelcomeVisibility } from '../hooks/useWelcomeVisibility'
 import { WelcomeVisibilityContext } from './WelcomeVisibilityContext'
 
 interface AppShellProps {
   children: React.ReactNode
+  version: string
 }
 
-export default function AppShell({ children }: AppShellProps) {
+export default function AppShell({ children, version }: AppShellProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -53,6 +54,7 @@ export default function AppShell({ children }: AppShellProps) {
             }`}
           >
             <UnifiedControlPanel
+              version={version}
               isCollapsed={isSidebarCollapsed && !isMobile}
               onToggleCollapse={toggleSidebar}
               isMobile={isMobile}

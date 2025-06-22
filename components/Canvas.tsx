@@ -17,8 +17,9 @@ const P5Sketch = dynamic(() => import('./P5Sketch'), {
 import { useJitter } from './JitterContext'
 import { Spinner } from './ui'
 
-export default function Canvas() {
-  const { params } = useJitter()
+export function Canvas() {
+  const { params, selectedLayer, layers } = useJitter()
+
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
   const [isFullscreenLoading, setIsFullscreenLoading] = useState(false)
@@ -32,18 +33,20 @@ export default function Canvas() {
       if (!isFullscreen) {
         if (canvasContainerRef.current.requestFullscreen) {
           await canvasContainerRef.current.requestFullscreen()
-        } else if (canvasContainerRef.current.webkitRequestFullscreen) {
-          await canvasContainerRef.current.webkitRequestFullscreen()
-        } else if (canvasContainerRef.current.msRequestFullscreen) {
-          await canvasContainerRef.current.msRequestFullscreen()
+        } else if (
+          (canvasContainerRef.current as any).webkitRequestFullscreen
+        ) {
+          await (canvasContainerRef.current as any).webkitRequestFullscreen()
+        } else if ((canvasContainerRef.current as any).msRequestFullscreen) {
+          await (canvasContainerRef.current as any).msRequestFullscreen()
         }
       } else {
         if (document.exitFullscreen) {
           await document.exitFullscreen()
-        } else if (document.webkitExitFullscreen) {
-          await document.webkitExitFullscreen()
-        } else if (document.msExitFullscreen) {
-          await document.msExitFullscreen()
+        } else if ((document as any).webkitExitFullscreen) {
+          await (document as any).webkitExitFullscreen()
+        } else if ((document as any).msExitFullscreen) {
+          await (document as any).msExitFullscreen()
         }
       }
     } catch {
@@ -57,8 +60,8 @@ export default function Canvas() {
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.msFullscreenElement
+        (document as any).webkitFullscreenElement ||
+        (document as any).msFullscreenElement
       )
       setIsFullscreen(isCurrentlyFullscreen)
     }
@@ -146,13 +149,35 @@ export default function Canvas() {
 
       {/* P5.js Sketch */}
       <div className="flex h-full w-full items-center justify-center">
-        <P5Sketch
-          width={canvasSize.width}
-          height={canvasSize.height}
-          density={params.density}
-          speed={params.speed}
-          selectedColor={params.selectedColor}
-        />
+        {selectedLayer ? (
+          <P5Sketch
+            key="main-canvas" // Stable key - only one canvas instance
+            width={canvasSize.width}
+            height={canvasSize.height}
+            params={params}
+            selectedLayer={selectedLayer}
+          />
+        ) : (
+          <div className="text-center">
+            <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
+              <div className="h-12 w-12 rounded bg-gray-200"></div>
+            </div>
+            <h3 className="mb-2 text-lg font-medium text-gray-900">
+              No Layer Selected
+            </h3>
+            <p className="mb-4 text-gray-500">
+              {layers.length === 0
+                ? 'Create a layer to start designing'
+                : 'Select a layer to see the preview'}
+            </p>
+            {layers.length === 0 && (
+              <p className="text-sm text-gray-400">
+                Use the &quot;Add Layer&quot; button in the sidebar to get
+                started
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
