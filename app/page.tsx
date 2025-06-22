@@ -2,7 +2,7 @@ import Canvas from '@/components/Canvas'
 
 export default function Home() {
   return (
-    <div className="space-y-6">
+    <div className="flex h-full flex-col gap-6">
       <div className="rounded-lg bg-white p-6 shadow-sm">
         <h1 className="mb-2 text-3xl font-bold text-gray-900">
           Welcome to Jitter Kit
@@ -35,7 +35,9 @@ export default function Home() {
       </div>
 
       {/* Canvas */}
-      <Canvas />
+      <div className="flex-1">
+        <Canvas />
+      </div>
     </div>
   )
 }

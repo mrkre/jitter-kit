@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+
 import { Maximize2, Minimize2 } from 'lucide-react'
 
 export default function Canvas() {
@@ -75,8 +76,8 @@ export default function Canvas() {
   return (
     <div
       ref={canvasContainerRef}
-      className={`relative flex items-center justify-center rounded-lg bg-gray-100 shadow-sm ${
-        isFullscreen ? 'fixed inset-0 z-50' : 'min-h-[400px]'
+      className={`relative flex h-full items-center justify-center rounded-lg bg-gray-100 shadow-sm ${
+        isFullscreen ? 'fixed inset-0 z-50' : ''
       }`}
     >
       {/* Fullscreen Toggle Button */}

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+
 import Header from './Header'
 import UnifiedControlPanel from './UnifiedControlPanel'
 
@@ -60,13 +61,15 @@ export default function AppShell({ children }: AppShellProps) {
 
       {/* Content Area */}
       <div
-        className={`flex h-screen flex-col transition-all duration-300 ease-in-out md:pl-80 ${
+        className={`flex h-screen flex-col transition-all duration-300 ease-in-out ${
           isMobile ? 'pl-0' : isSidebarCollapsed ? 'md:pl-16' : 'md:pl-80'
         }`}
       >
         <Header />
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto p-4 md:p-6 lg:p-8">{children}</div>
+        <main className="flex flex-1 flex-col overflow-y-auto">
+          <div className="container mx-auto h-full p-4 md:p-6 lg:p-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>
