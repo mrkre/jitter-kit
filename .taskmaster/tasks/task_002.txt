@@ -1,0 +1,139 @@
+# Task ID: 2
+# Title: Implement Jitter Engine Core
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Implement the core logic for generating jittered points and shapes based on parameters like density, speed, and amplitude. This engine will be the heart of the pattern generation.
+# Details:
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Define Jitter Engine Parameters and Data Structures [done]
+### Dependencies: None
+### Description: Specify and document the core parameters (density, speed, amplitude) and design the data structures required for representing jittered points and shapes.
+### Details:
+Establish clear parameter definitions and create data models for points and shapes that will be manipulated by the jitter engine.
+<info added on 2025-06-22T16:04:40.968Z>
+Define the following data structures for the jitter engine:
+
+```typescript
+interface Project {
+  layers: Layer[];
+  selectedLayerId: string | null;
+}
+
+interface Layer {
+  id: string;
+  name: string;
+  type: 'grid' | 'mask';
+  visible: boolean;
+  isClipped: boolean;
+  parameters: {
+    algorithm: 'uniform' | 'noise' | 'recursive' | 'isometric';
+    density: number;
+    gutter: number;
+    colorPalette: string[];
+    // ... other algorithm-specific params
+  };
+  animation: {
+    type: 'none' | 'pulseScale' | 'cycleColor';
+    speed: number;
+    duration: number;
+  };
+}
+```
+
+Implement core parameters for all algorithms:
+- density: controls the number of elements
+- speed: affects animation rate
+- amplitude: determines movement range
+- gutter: defines spacing between elements
+
+Each algorithm type ('uniform', 'noise', 'recursive', 'isometric') will require additional specific parameters to be defined during implementation.
+</info added on 2025-06-22T16:04:40.968Z>
+
+## 2. Develop Jitter Generation Algorithms [done]
+### Dependencies: 2.1
+### Description: Implement algorithms to generate jittered points and shapes based on the defined parameters, incorporating deterministic and random jitter components as needed.
+### Details:
+Use mathematical models and modulation techniques to simulate jitter effects, ensuring flexibility for different jitter types.
+<info added on 2025-06-22T16:05:31.784Z>
+Implement four distinct generative algorithms for the jitter engine:
+1. Uniform Grid - Create evenly spaced points with controlled random displacement
+2. Noise Displacement Grid - Apply Perlin or simplex noise functions to displace grid points
+3. Recursive Subdivision - Generate points through iterative subdivision with varying density
+4. Isometric Grid - Implement triangular/hexagonal grid patterns with controlled jitter
+
+Each algorithm should be modular, well-documented, and include parameters for controlling the amount and character of jitter effects.
+</info added on 2025-06-22T16:05:31.784Z>
+
+## 3. Integrate Parameter Control and Modulation [done]
+### Dependencies: 2.2
+### Description: Enable dynamic adjustment of density, speed, and amplitude parameters, allowing real-time modulation of jitter characteristics.
+### Details:
+Implement interfaces or APIs for parameter updates and ensure the jitter engine responds correctly to changes.
+<info added on 2025-06-22T16:05:59.531Z>
+Implement parameter control integration with Zustand state management. Create a store that maintains all jitter parameters and their current values. Develop subscription mechanisms for the canvas component to reactively respond to parameter changes. Ensure the API supports:
+
+1. Parameter registration with metadata (min/max values, step sizes, default values)
+2. Batch parameter updates for performance optimization
+3. History tracking for undo/redo functionality
+4. Parameter presets for saving and loading configurations
+
+Test the reactivity chain from UI controls through the state store to the rendering engine, verifying that parameter changes result in immediate visual updates without performance degradation.
+</info added on 2025-06-22T16:05:59.531Z>
+
+## 4. Optimize Performance and Resource Usage [pending]
+### Dependencies: 2.3
+### Description: Profile and optimize the jitter engine for computational efficiency and minimal resource consumption, especially for high-density or high-speed scenarios.
+### Details:
+Identify bottlenecks and refactor code for improved performance without sacrificing output quality.
+<info added on 2025-06-22T16:06:10.943Z>
+Performance optimization strategies:
+1. Use React.memo selectively on components to prevent unnecessary re-renders when props haven't changed
+2. Implement offscreen canvas buffering for static or infrequently changing visual layers
+3. Profile render cycles to identify and eliminate redundant calculations
+4. Consider implementing a throttling mechanism for high-frequency parameter changes
+5. Separate UI thread from processing thread where possible to maintain responsiveness
+
+These optimizations should be implemented while maintaining the quality standards for jitter outputs as specified in the PRD.
+</info added on 2025-06-22T16:06:10.943Z>
+
+## 6. Implement Layer Compositing & Clipping Logic [pending]
+### Dependencies: None
+### Description: This subtask will cover the logic for processing multiple layers, including their visibility and clipping properties, as defined in the PRD.
+### Details:
+The engine's main loop should iterate through the `layers` array provided in the `Project` state. For each layer, it should generate the pattern based on its parameters and then render it to the canvas. This subtask includes handling the `isClipped` property, where a layer acts as a mask for the one below it.
+<info added on 2025-06-22T16:08:18.468Z>
+The Jitter Engine should implement a command-based architecture to maintain separation of concerns. Instead of directly rendering to the canvas, the engine will:
+
+1. Process the layer stack, evaluating visibility and clipping masks
+2. Generate a structured list of primitive drawing commands (e.g., `{ type: 'rect', x: 10, y: 10, width: 5, height: 5, color: '#ff0000' }`)
+3. Return this command list as its output
+
+This approach decouples the engine's generative logic from the rendering implementation. The `P5Sketch` component will be responsible for:
+- Consuming the command list produced by the engine
+- Translating these abstract commands into p5.js-specific drawing function calls
+- Executing the rendering in its `draw` loop
+
+This separation allows the engine to remain agnostic to the rendering library, making it more maintainable and potentially compatible with different rendering backends in the future.
+</info added on 2025-06-22T16:08:18.468Z>
+
+## 5. Validate and Visualize Jittered Outputs [pending]
+### Dependencies: 2.4
+### Description: Develop tools or scripts to visualize jittered points and shapes, and validate the engine's outputs against design requirements.
+### Details:
+Create visualizations (e.g., plots, diagrams) and perform qualitative and quantitative assessments of jitter patterns.
+<info added on 2025-06-22T16:06:25.301Z>
+Implement real-time visual feedback mechanisms to ensure canvas updates instantly when parameters are manipulated. Validate that visualizations correctly reflect the current state in the data store without perceptible delay. Structure the generated output to maintain clean organization and proper formatting for SVG export compatibility. Test the responsiveness of the visualization system under various parameter change scenarios and data loads to ensure consistent performance.
+</info added on 2025-06-22T16:06:25.301Z>
+
+## 7. Implement Color Palette Application Logic [pending]
+### Dependencies: None
+### Description: This subtask will ensure the engine applies the `colorPalette` from a layer's parameters to the visual elements it generates.
+### Details:
+The rendering part of the engine for each layer should access the `colorPalette` array from its parameters. Implement logic to cycle through, randomly select, or map colors from the palette to the individual points or shapes being drawn. This should be flexible enough to support different coloring strategies in the future.
+

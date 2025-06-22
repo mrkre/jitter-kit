@@ -38,6 +38,129 @@ Modern Next.js 15+ application built with TypeScript, ESLint 9, Prettier, and co
 - Add 'use client' directive to all interactive components
 - Use dynamic imports with `ssr: false` for client-only libraries
 
+### Canvas and P5.js Rules (CRITICAL)
+
+**⚠️ NEVER create multiple Canvas or P5.js instances**
+
+- **ONE Canvas component per application** - Only render `<Canvas />` once in the entire component tree
+- **Stable Canvas mounting** - Always use a stable `key` prop on Canvas to prevent re-mounting
+- **Proper P5 cleanup** - Always cleanup P5 instances in useEffect cleanup functions
+- **No conditional Canvas rendering** - Avoid conditionally rendering Canvas based on loading states
+
+```typescript
+// ✅ CORRECT - Single Canvas with stable key
+<Canvas key="main-canvas" />
+
+// ❌ WRONG - Multiple Canvas instances
+<Canvas />
+<Canvas />
+
+// ❌ WRONG - Conditional rendering that causes re-mounting
+{isLoaded && <Canvas />}
+
+// ✅ CORRECT - Conditional content, stable Canvas
+{isLoaded && <WelcomeContent />}
+<Canvas key="main-canvas" />
+```
+
+**P5.js Component Rules:**
+- Always cleanup existing P5 instances before creating new ones
+- Use empty dependency array `[]` for P5 instance creation useEffect
+- Implement proper ResizeObserver cleanup
+- Never create P5 instances outside useEffect
+- **Clear DOM before creating new canvas**: Remove existing canvas elements in setup()
+- **Use stable keys for canvas persistence**: NEVER change canvas key during normal operations
+- **Implement updateWithProps pattern**: For parameter updates without full re-mount
+- **Deep parameter comparison**: Use JSON.stringify for dependency arrays with objects
+- **Layer-aware rendering**: Handle selectedLayer changes without canvas re-mount
+- **CRITICAL: Canvas must persist across layer operations** - Adding/selecting layers should NOT destroy canvas
+
+```typescript
+// P5.js Component Pattern with Layer Management
+export function P5Sketch({ params, selectedLayer }: { params: any; selectedLayer?: string | null }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const p5InstanceRef = useRef<CustomP5 | null>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const container = containerRef.current
+
+    // Clear existing canvases
+    while (container.firstChild) {
+      container.removeChild(container.firstChild)
+    }
+
+    // Remove existing P5 instance
+    if (p5InstanceRef.current) {
+      p5InstanceRef.current.remove()
+      p5InstanceRef.current = null
+    }
+
+    const sketch = (p: CustomP5) => {
+      p.setup = () => {
+        // Double-check for canvas cleanup
+        const existingCanvases = container.querySelectorAll('canvas')
+        existingCanvases.forEach(canvas => canvas.remove())
+        
+        p.createCanvas(container.clientWidth, container.clientHeight)
+        
+        // Only initialize if we have a selected layer
+        if (selectedLayer) {
+          initializeDrawing()
+        }
+      }
+
+      p.updateWithProps = (props: any) => {
+        // Handle parameter updates - LAYER-AWARE
+        if (props.params && props.selectedLayer) {
+          // Update and redraw only if layer is selected
+          initializeDrawing()
+          p.redraw()
+        } else if (!props.selectedLayer) {
+          // Clear canvas if no layer selected
+          clearCanvas()
+          p.redraw()
+        }
+      }
+    }
+
+    p5InstanceRef.current = new p5(sketch, container) as CustomP5
+
+    return () => {
+      if (p5InstanceRef.current) {
+        p5InstanceRef.current.remove()
+        p5InstanceRef.current = null
+      }
+      while (container.firstChild) {
+        container.removeChild(container.firstChild)
+      }
+    }
+  }, []) // Empty array - only run once, NEVER re-mount during layer operations
+
+  // Parameter AND layer updates - but no re-mount
+  useEffect(() => {
+    if (p5InstanceRef.current) {
+      p5InstanceRef.current.updateWithProps({ params, selectedLayer })
+    }
+  }, [JSON.stringify(params), selectedLayer]) // Include selectedLayer but don't re-mount
+
+  return <div ref={containerRef} className="h-full w-full" />
+}
+
+// Canvas Usage - STABLE KEY
+<P5Sketch 
+  key="main-canvas" // NEVER change this key during layer operations
+  params={params}
+  selectedLayer={selectedLayer}
+/>
+```
+
+**⚠️ CRITICAL Canvas Patterns:**
+- **Stable Keys**: `key="main-canvas"` should NEVER change during layer add/select operations
+- **Layer-Aware Updates**: Use `updateWithProps` for layer changes, not component re-mounting
+- **Persist State**: Canvas survives layer additions, deletions, and selections
+- **Clear vs Destroy**: Clear canvas content when no layer selected, don't destroy canvas
+
 ```typescript
 'use client'
 
