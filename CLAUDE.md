@@ -85,6 +85,71 @@ import type { User } from '@/types/User.types'
 - **Small functions** - Keep functions focused and testable
 - **Error boundaries** - Implement proper error handling
 
+### Tailwind CSS Best Practices
+
+- **Avoid Concatenating Class Names**: Do not create class names dynamically. Tailwind's JIT compiler scans source files for complete class strings and will miss dynamically generated ones.
+
+  ```typescript
+  // ❌ Don't do this
+  const Button = ({ color, children }) => (
+    <button className={`bg-${color}-500 text-white`}>{children}</button>
+  );
+  
+  // ✅ Do this instead
+  function Button({ color, children }) {
+    const colorVariants = {
+      blue: "bg-blue-600 hover:bg-blue-500 text-white",
+      red: "bg-red-500 hover:bg-red-400 text-white",
+    };
+  
+    return <button className={colorVariants[color]}>{children}</button>;
+  }
+  ```
+
+- **Handle Conditional Classes Correctly**: When applying classes based on props or state, ensure you are toggling complete class strings.
+
+  ```typescript
+  // ✅ Good for conditional logic
+  export function Example({ gridLayout }) {
+    return <div className={gridLayout ? "grid" : "flex"}>{/* ... */}</div>;
+  }
+  ```
+
+- **Handle Specificity with `!important`**: If you need to override a style with higher specificity, you can make a utility `!important` by adding a `!` character to the beginning.
+
+  ```html
+  <div class="bg-teal-500 !bg-red-500">
+    <!-- This will have a red background -->
+  </div>
+  ```
+
+- **Use Modern CSS Features**:
+  - **Media Queries**: Replace the deprecated `@screen` directive with the `screen()` function inside a standard `@media` rule.
+
+      ```css
+      /* ❌ Deprecated */
+      @screen sm {
+        /* ... */
+      }
+      
+      /* ✅ Modern */
+      @media screen(sm) {
+        /* ... */
+      }
+      ```
+
+- **Avoid Deprecated Classes**: Some utility classes have been replaced in recent Tailwind versions.
+
+  | Deprecated              | Replacement                               |
+  | ----------------------- | ----------------------------------------- |
+  | `bg-opacity-*`          | Opacity modifiers like `bg-black/50`      |
+  | `text-opacity-*`        | Opacity modifiers like `text-black/50`    |
+  | `border-opacity-*`      | Opacity modifiers like `border-black/50`  |
+  | `flex-grow-*`           | `grow-*`                                  |
+  | `flex-shrink-*`         | `shrink-*`                                |
+  | `overflow-ellipsis`     | `text-ellipsis`                           |
+  | `decoration-clone`      | `box-decoration-clone`                    |
+
 ### Performance Considerations
 
 - Use Next.js Image component for images
@@ -92,6 +157,12 @@ import type { User } from '@/types/User.types'
 - Use React.memo() for expensive components
 - Prefer server components when possible
 - Use dynamic imports for code splitting
+- IMPORTANT: Use `pnpm` as the package manager instead of `npm` or `npx`
+
+## Cursor
+
+- Cursor rules are stored under `.cursor/rules` using `.mdc` format
+- Follow existing file format to ensure that the rules work
 
 ## Common Patterns
 
