@@ -221,9 +221,33 @@ export function Button({
 
 ## Component Patterns
 
+### CRITICAL: Export Standards
+- **ALWAYS use named exports** for components (NO default exports)
+- Place interfaces/types above component definition
+- Add 'use client' directive to ALL interactive components
+
+```tsx
+// ✅ CORRECT - Named Export with 'use client'
+'use client'
+
+interface ButtonProps {
+  variant?: 'primary' | 'secondary'
+  children: React.ReactNode
+}
+
+export function Button({ variant = 'primary', children }: ButtonProps) {
+  return <button className={`btn-${variant}`}>{children}</button>
+}
+```
+
+```tsx
+// ❌ INCORRECT - Default Export
+export default function Button() { /* ... */ }
+```
+
 ### Server Component (Default)
 ```tsx
-// app/posts/page.tsx
+// app/posts/page.tsx - Server components can use default exports in app directory
 export default async function PostsPage() {
   const posts = await getPosts() // Direct async/await
   
@@ -242,8 +266,12 @@ export default async function PostsPage() {
 
 import { useState } from 'react'
 
-export function Counter() {
-  const [count, setCount] = useState(0)
+interface CounterProps {
+  initialValue?: number
+}
+
+export function Counter({ initialValue = 0 }: CounterProps) {
+  const [count, setCount] = useState(initialValue)
   
   return (
     <button 
@@ -254,6 +282,46 @@ export function Counter() {
     </button>
   )
 }
+```
+
+### Client-Only Libraries (P5.js, Chart.js, etc.)
+For libraries that don't support SSR, use dynamic imports:
+
+```tsx
+import dynamic from 'next/dynamic'
+import { Spinner } from './ui'
+
+const P5Sketch = dynamic(() => import('./P5Sketch'), {
+  ssr: false,
+  loading: () => <Spinner size="lg" />,
+})
+
+export function Canvas() {
+  return (
+    <div className="canvas-container">
+      <P5Sketch width={800} height={600} />
+    </div>
+  )
+}
+```
+
+### Component Index Files
+Create index files for clean imports:
+
+```tsx
+// components/index.ts
+export { AppShell } from './AppShell'
+export { Canvas } from './Canvas'
+export { Header } from './Header'
+// Re-export UI components
+export * from './ui'
+```
+
+```tsx
+// components/ui/index.ts
+export { Button } from './Button'
+export { Slider } from './Slider'
+export { ColorPicker } from './ColorPicker'
 ```
 
 ### Hybrid Pattern
