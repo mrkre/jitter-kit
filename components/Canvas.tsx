@@ -4,13 +4,30 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 
 import { Maximize2, Minimize2 } from 'lucide-react'
 
+import dynamic from 'next/dynamic'
+
+const P5Sketch = dynamic(() => import('./P5Sketch'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center">
+      <Spinner size="lg" />
+    </div>
+  ),
+})
+import { useJitter } from './JitterContext'
+import { Spinner } from './ui'
+
 export default function Canvas() {
+  const { params } = useJitter()
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+  const [isFullscreenLoading, setIsFullscreenLoading] = useState(false)
   const canvasContainerRef = useRef<HTMLDivElement>(null)
 
   const toggleFullscreen = useCallback(async () => {
     if (!canvasContainerRef.current) return
 
+    setIsFullscreenLoading(true)
     try {
       if (!isFullscreen) {
         if (canvasContainerRef.current.requestFullscreen) {
@@ -31,6 +48,8 @@ export default function Canvas() {
       }
     } catch {
       // Error handling can be improved here if needed
+    } finally {
+      setTimeout(() => setIsFullscreenLoading(false), 300)
     }
   }, [isFullscreen])
 
@@ -73,6 +92,26 @@ export default function Canvas() {
     }
   }, [isFullscreen, toggleFullscreen])
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect
+        setCanvasSize({
+          width: Math.max(width - 32, 400),
+          height: Math.max(height - 32, 300),
+        })
+      }
+    })
+
+    if (canvasContainerRef.current) {
+      resizeObserver.observe(canvasContainerRef.current)
+    }
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [])
+
   return (
     <div
       ref={canvasContainerRef}
@@ -83,7 +122,8 @@ export default function Canvas() {
       {/* Fullscreen Toggle Button */}
       <button
         onClick={toggleFullscreen}
-        className="absolute top-4 right-4 z-10 rounded-md bg-gray-800 p-2 text-white transition-all hover:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none"
+        disabled={isFullscreenLoading}
+        className="absolute top-4 right-4 z-10 rounded-md bg-gray-800 p-2 text-white transition-all hover:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         aria-label={
           isFullscreen
             ? 'Exit fullscreen (Esc)'
@@ -95,15 +135,25 @@ export default function Canvas() {
             : 'Enter fullscreen (F11 or Ctrl+F)'
         }
       >
-        {isFullscreen ? (
+        {isFullscreenLoading ? (
+          <Spinner size="sm" className="border-white border-t-gray-400" />
+        ) : isFullscreen ? (
           <Minimize2 className="h-5 w-5" />
         ) : (
           <Maximize2 className="h-5 w-5" />
         )}
       </button>
 
-      {/* Canvas Content Placeholder */}
-      <p className="text-gray-500">Canvas area - Pattern editor will go here</p>
+      {/* P5.js Sketch */}
+      <div className="flex h-full w-full items-center justify-center">
+        <P5Sketch
+          width={canvasSize.width}
+          height={canvasSize.height}
+          density={params.density}
+          speed={params.speed}
+          selectedColor={params.selectedColor}
+        />
+      </div>
     </div>
   )
 }

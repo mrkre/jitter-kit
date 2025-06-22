@@ -18,4 +18,11 @@
   h6 {
     @apply font-semibold;
   }
+
+  /* Prevent p5.js canvas from interfering with scroll */
+  canvas.p5Canvas {
+    touch-action: none;
+    pointer-events: auto;
+    display: block;
+  }
 }

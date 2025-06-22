@@ -24,7 +24,9 @@ import {
   Select,
   selectPresets,
   sliderFormatters,
+  Spinner,
 } from './ui'
+import { useJitter } from './JitterContext'
 
 interface UnifiedControlPanelProps {
   isCollapsed?: boolean
@@ -37,10 +39,24 @@ export default function UnifiedControlPanel({
   onToggleCollapse,
   isMobile = false,
 }: UnifiedControlPanelProps) {
-  const [selectedColor, setSelectedColor] = useState('purple')
-  const [density, setDensity] = useState(10)
-  const [speed, setSpeed] = useState(1)
-  const [duration, setDuration] = useState(2)
+  const { params, updateParams } = useJitter()
+  const [exportLoading, setExportLoading] = useState<string | null>(null)
+
+  const handleExport = async (type: 'svg' | 'gsap' | 'project') => {
+    setExportLoading(type)
+    try {
+      // Simulate export operation
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // TODO: Implement actual export logic
+      // eslint-disable-next-line no-console
+      console.log(`Exporting as ${type}...`)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Export failed:', error)
+    } finally {
+      setExportLoading(null)
+    }
+  }
 
   return (
     <aside
@@ -167,8 +183,8 @@ export default function UnifiedControlPanel({
 
                 <Slider
                   label="Density"
-                  value={density}
-                  onChange={setDensity}
+                  value={params.density}
+                  onChange={(value) => updateParams({ density: value })}
                   min={1}
                   max={50}
                   step={1}
@@ -180,8 +196,10 @@ export default function UnifiedControlPanel({
                     Colors
                   </label>
                   <ColorPicker
-                    selectedColorId={selectedColor}
-                    onColorSelect={setSelectedColor}
+                    selectedColorId={params.selectedColor}
+                    onColorSelect={(color) =>
+                      updateParams({ selectedColor: color })
+                    }
                     onColorAdd={(_color) => {
                       // TODO: Implement color adding logic
                       // eslint-disable-next-line no-console
@@ -219,8 +237,8 @@ export default function UnifiedControlPanel({
 
                 <Slider
                   label="Speed"
-                  value={speed}
-                  onChange={setSpeed}
+                  value={params.speed}
+                  onChange={(value) => updateParams({ speed: value })}
                   min={0.1}
                   max={5}
                   step={0.1}
@@ -230,8 +248,8 @@ export default function UnifiedControlPanel({
 
                 <Slider
                   label="Duration"
-                  value={duration}
-                  onChange={setDuration}
+                  value={params.duration}
+                  onChange={(value) => updateParams({ duration: value })}
                   min={0.5}
                   max={10}
                   step={0.5}
@@ -259,14 +277,50 @@ export default function UnifiedControlPanel({
             </AccordionTrigger>
             <AccordionContent id="export">
               <div className="space-y-3">
-                <Button variant="primary" fullWidth>
-                  Export as SVG
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={() => handleExport('svg')}
+                  disabled={exportLoading !== null}
+                >
+                  {exportLoading === 'svg' ? (
+                    <div className="flex items-center gap-2">
+                      <Spinner size="sm" />
+                      <span>Exporting...</span>
+                    </div>
+                  ) : (
+                    'Export as SVG'
+                  )}
                 </Button>
-                <Button variant="secondary" fullWidth>
-                  Export as GSAP
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => handleExport('gsap')}
+                  disabled={exportLoading !== null}
+                >
+                  {exportLoading === 'gsap' ? (
+                    <div className="flex items-center gap-2">
+                      <Spinner size="sm" />
+                      <span>Exporting...</span>
+                    </div>
+                  ) : (
+                    'Export as GSAP'
+                  )}
                 </Button>
-                <Button variant="ghost" fullWidth>
-                  Save Project
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  onClick={() => handleExport('project')}
+                  disabled={exportLoading !== null}
+                >
+                  {exportLoading === 'project' ? (
+                    <div className="flex items-center gap-2">
+                      <Spinner size="sm" />
+                      <span>Saving...</span>
+                    </div>
+                  ) : (
+                    'Save Project'
+                  )}
                 </Button>
               </div>
             </AccordionContent>

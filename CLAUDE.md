@@ -32,11 +32,15 @@ Modern Next.js 15+ application built with TypeScript, ESLint 9, Prettier, and co
 ### Component Conventions
 
 - Use functional components with TypeScript
-- Prefer named exports for components
+- **ALWAYS use named exports** for components (no default exports)
 - Use PascalCase for component names
 - Place interfaces/types above component definition
+- Add 'use client' directive to all interactive components
+- Use dynamic imports with `ssr: false` for client-only libraries
 
 ```typescript
+'use client'
+
 interface ButtonProps {
   variant?: 'primary' | 'secondary'
   size?: 'sm' | 'md' | 'lg'
@@ -50,6 +54,42 @@ export function Button({ variant = 'primary', size = 'md', children }: ButtonPro
     </button>
   )
 }
+```
+
+#### Export Patterns
+**✅ Correct - Named Export:**
+```typescript
+export function MyComponent() { /* ... */ }
+```
+
+**❌ Incorrect - Default Export:**
+```typescript
+export default function MyComponent() { /* ... */ }
+```
+
+#### Client-Only Libraries
+For libraries that don't support SSR (like P5.js, Chart.js, etc.):
+
+```typescript
+import dynamic from 'next/dynamic'
+import { Spinner } from './ui'
+
+const P5Sketch = dynamic(() => import('./P5Sketch'), {
+  ssr: false,
+  loading: () => <Spinner size="lg" />,
+})
+```
+
+#### Component Index Files
+Create index files for easy importing:
+
+```typescript
+// components/index.ts
+export { AppShell } from './AppShell'
+export { Canvas } from './Canvas'
+export { Header } from './Header'
+// Re-export UI components
+export * from './ui'
 ```
 
 ### File Naming

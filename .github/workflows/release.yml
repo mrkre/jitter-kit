@@ -27,6 +27,9 @@ jobs:
          fetch-depth: 0
          token: ${{ secrets.GITHUB_TOKEN }}
  
+     - name: Create release branch
+       run: git checkout -b release/automated-${{ github.run_number }}
+ 
      - name: Generate release
        id: changelog
        uses: TriPSs/conventional-changelog-action@v6
@@ -34,7 +37,6 @@ jobs:
          github-token: ${{ secrets.GITHUB_TOKEN }}
          output-file: "CHANGELOG.md"
          release-count: "0"
-         git-branch: "release/automated-${{ github.run_number }}"
          skip-on-empty: "true"
          skip-version-file: "false"
          skip-commit: "false"
