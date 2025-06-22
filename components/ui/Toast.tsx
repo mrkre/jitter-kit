@@ -48,8 +48,8 @@ const positionStyles: Record<ToastPosition, string> = {
   'top-left': 'top-4 left-4',
   'bottom-right': 'bottom-4 right-4',
   'bottom-left': 'bottom-4 left-4',
-  'top-center': 'top-4 left-1/2 -translate-x-1/2',
-  'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2',
+  'top-center': 'top-4 left-1/2 transform -translate-x-1/2',
+  'bottom-center': 'bottom-4 left-1/2 transform -translate-x-1/2',
 }
 
 export const Toast = forwardRef<HTMLDivElement, ToastProps>(
@@ -72,7 +72,6 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
     const baseStyles = `
       flex items-start gap-3 p-4 rounded-lg border shadow-lg
       transition-all duration-300 ease-in-out
-      animate-in slide-in-from-right-full
     `
 
     const combinedClassName = `
@@ -95,7 +94,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
         </div>
         <button
           onClick={() => onClose(id)}
-          className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-black/5 focus:ring-2 focus:ring-current focus:ring-offset-2 focus:outline-none"
+          className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-gray-100 focus:ring-2 focus:ring-current focus:ring-offset-2 focus:outline-none"
           aria-label="Close notification"
         >
           <X className="h-4 w-4" />
