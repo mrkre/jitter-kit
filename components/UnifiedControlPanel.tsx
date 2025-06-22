@@ -1,5 +1,6 @@
 'use client'
 
+import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 
 interface UnifiedControlPanelProps {
@@ -18,7 +19,7 @@ interface AccordionSectionProps {
 function AccordionSection({
   title,
   children,
-  defaultOpen = true,
+  defaultOpen = false,
   isCollapsed = false,
 }: AccordionSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen)
@@ -28,27 +29,17 @@ function AccordionSection({
   }
 
   return (
-    <div className="border-b border-gray-800">
+    <div className="border-b border-gray-200/5">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-gray-800"
+        className="flex w-full items-center justify-between p-4 text-left transition-colors duration-200 hover:bg-gray-50/5"
       >
-        <h3 className="text-sm font-semibold tracking-wider text-gray-300 uppercase">
+        <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">
           {title}
         </h3>
-        <svg
-          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
+        <ChevronDown
+          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        />
       </button>
       {isOpen && <div className="p-4 pt-0">{children}</div>}
     </div>
@@ -62,46 +53,29 @@ export default function UnifiedControlPanel({
 }: UnifiedControlPanelProps) {
   return (
     <aside
-      className={` ${isMobile ? 'fixed' : 'relative'} top-0 left-0 h-full bg-gray-900 text-white transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-80'} flex flex-col overflow-hidden shadow-xl`}
+      className={`flex h-full flex-col border-r border-gray-200/80 bg-white/95 backdrop-blur-sm transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-80'} `}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-800 p-4">
+      <div className="flex h-16 items-center justify-between border-b border-gray-200/80 p-4">
         <div
-          className={`flex items-center gap-3 ${isCollapsed ? 'hidden' : 'flex'}`}
+          className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'w-0' : 'w-full'}`}
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
             <span className="text-sm font-bold text-white">J</span>
           </div>
-          <h2 className="text-lg font-semibold">jitter-kit</h2>
+          <h2 className="text-lg font-semibold whitespace-nowrap text-gray-800">
+            jitter-kit
+          </h2>
         </div>
         {!isMobile && (
           <button
             onClick={onToggleCollapse}
-            className="rounded-lg p-2 transition-colors hover:bg-gray-800"
+            className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isCollapsed ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 5l7 7-7 7"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 19l-7-7 7-7"
-                />
-              )}
-            </svg>
+            <ChevronDown
+              className={`h-5 w-5 transition-transform duration-300 ${isCollapsed ? '-rotate-90' : 'rotate-90'}`}
+            />
           </button>
         )}
       </div>
@@ -114,17 +88,17 @@ export default function UnifiedControlPanel({
           defaultOpen={true}
           isCollapsed={isCollapsed}
         >
-          <div className="space-y-3">
+          <div className="space-y-2">
             {/* Add Layer Button */}
-            <button className="w-full rounded-lg border-2 border-dashed border-gray-700 p-3 text-gray-400 transition-colors hover:border-gray-600 hover:bg-gray-800 hover:text-white">
+            <button className="w-full rounded-md border border-gray-200/80 p-2 text-sm text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50/50 hover:text-gray-800">
               + Add Layer
             </button>
 
             {/* Placeholder Layer Items */}
-            <div className="space-y-2">
-              <div className="rounded-lg bg-gray-800 p-3">
+            <div className="space-y-2 pt-2">
+              <div className="rounded-md border border-transparent bg-gray-50/80 p-2 hover:border-gray-200/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">Layer 1</span>
+                  <span className="text-sm text-gray-700">Layer 1</span>
                   <div className="flex items-center gap-2">
                     <button
                       className="rounded p-1 hover:bg-gray-700"
@@ -186,10 +160,10 @@ export default function UnifiedControlPanel({
         >
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-gray-500">
                 Algorithm
               </label>
-              <select className="w-full rounded-lg border border-gray-700 bg-gray-800 p-2 focus:border-purple-500 focus:outline-none">
+              <select className="w-full rounded-md border-gray-200/80 bg-white/80 p-2 text-sm focus:border-purple-500 focus:ring-purple-500">
                 <option>Uniform Grid</option>
                 <option>Noise Displacement</option>
                 <option>Recursive Subdivision</option>
@@ -198,7 +172,7 @@ export default function UnifiedControlPanel({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-gray-500">
                 Density
               </label>
               <input
@@ -211,12 +185,14 @@ export default function UnifiedControlPanel({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-gray-400">Colors</label>
-              <div className="flex gap-2">
-                <div className="h-8 w-8 cursor-pointer rounded bg-purple-500 hover:ring-2 hover:ring-purple-400"></div>
-                <div className="h-8 w-8 cursor-pointer rounded bg-pink-500 hover:ring-2 hover:ring-pink-400"></div>
-                <div className="h-8 w-8 cursor-pointer rounded bg-blue-500 hover:ring-2 hover:ring-blue-400"></div>
-                <button className="h-8 w-8 rounded border-2 border-dashed border-gray-700 hover:border-gray-600">
+              <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                Colors
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <div className="h-7 w-7 cursor-pointer rounded border-2 border-purple-500 bg-purple-500 shadow-sm"></div>
+                <div className="h-7 w-7 cursor-pointer rounded border-2 border-white bg-pink-500 shadow-sm hover:border-pink-300"></div>
+                <div className="h-7 w-7 cursor-pointer rounded border-2 border-white bg-blue-500 shadow-sm hover:border-blue-300"></div>
+                <button className="h-7 w-7 rounded border border-dashed border-gray-300 text-gray-400 hover:border-gray-400 hover:text-gray-600">
                   +
                 </button>
               </div>
@@ -232,10 +208,10 @@ export default function UnifiedControlPanel({
         >
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-gray-500">
                 Animation Type
               </label>
-              <select className="w-full rounded-lg border border-gray-700 bg-gray-800 p-2 focus:border-purple-500 focus:outline-none">
+              <select className="w-full rounded-md border-gray-200/80 bg-white/80 p-2 text-sm focus:border-purple-500 focus:ring-purple-500">
                 <option>None</option>
                 <option>Pulse Scale</option>
                 <option>Cycle Colors</option>
@@ -243,7 +219,9 @@ export default function UnifiedControlPanel({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-gray-400">Speed</label>
+              <label className="mb-1.5 block text-xs font-medium text-gray-500">
+                Speed
+              </label>
               <input
                 type="range"
                 className="w-full"
@@ -255,7 +233,7 @@ export default function UnifiedControlPanel({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-gray-400">
+              <label className="mb-1.5 block text-xs font-medium text-gray-500">
                 Duration (seconds)
               </label>
               <input
