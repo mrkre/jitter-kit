@@ -1,264 +1,373 @@
 {
-  "master": {
-    "tasks": [
-      {
-        "id": 1,
-        "title": "Create Application Shell and Layout",
-        "description": "Implement the basic UI shell with the header and unified control panel layout as specified in the PRD.",
-        "details": "This task involves setting up the foundational UI structure for the application:\n\n1. Create the main application container with appropriate CSS grid or flexbox layout\n2. Implement the header component with:\n   - Application logo/name\n   - Navigation menu (if specified in PRD)\n   - User account/profile section (if applicable)\n3. Design the unified control panel layout with:\n   - Consistent spacing and alignment\n   - Placeholder sections for future controls\n   - Responsive design considerations for different screen sizes\n4. Set up basic routing structure (if using a SPA framework)\n5. Implement basic theme variables for colors, typography, and spacing\n6. Ensure accessibility standards are met (proper heading hierarchy, ARIA attributes)\n7. Create reusable layout components that can be extended in future tasks\n\nUse semantic HTML elements and follow the design specifications in the PRD. Ensure the layout is responsive and works across all required browsers and devices.",
-        "testStrategy": "1. Visual inspection against design mockups in the PRD\n2. Verify responsive behavior by testing at multiple viewport sizes (mobile, tablet, desktop)\n3. Check browser compatibility in all required browsers (Chrome, Firefox, Safari, Edge)\n4. Validate HTML structure using browser developer tools\n5. Run accessibility checks using tools like Lighthouse or axe\n6. Verify that the layout accommodates dynamic content without breaking\n7. Test keyboard navigation through the interface\n8. Ensure the application shell renders correctly with no console errors\n9. Verify that the layout structure can be easily extended for future components\n10. Document any deviations from the PRD with justification",
-        "status": "done",
-        "dependencies": [],
-        "priority": "medium",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Refine Header Component styles for better alignment and spacing.",
-            "description": "Use Tailwind CSS utility classes to ensure the logo, title, and any navigation elements are properly aligned and have consistent spacing.",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 2,
-            "title": "Implement a more robust responsive layout for the main content area using CSS Grid or Flexbox.",
-            "description": "Currently, the main content area might not be handling different screen sizes well. This subtask is to refactor the layout to use modern CSS techniques for a more stable and responsive design.",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 3,
-            "title": "Add visual polish to the UnifiedControlPanel, including shadows and consistent padding.",
-            "description": "This involves adding subtle shadows to create depth, and ensuring all elements within the panel have consistent padding to improve visual hierarchy and organization.",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 4,
-            "title": "Ensure font sizes and weights are consistent across the application shell.",
-            "description": "Review and adjust font sizes and weights throughout the application shell to ensure a consistent and readable typography. This will contribute to a more professional and polished look.",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Implement Jitter Engine Core",
-        "description": "Implement the core logic for generating jittered points and shapes based on parameters like density, speed, and amplitude. This engine will be the heart of the pattern generation.",
-        "details": "",
-        "testStrategy": "",
-        "status": "pending",
-        "dependencies": [
-          "8"
-        ],
-        "priority": "medium",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Define Jitter Engine Parameters and Data Structures",
-            "description": "Specify and document the core parameters (density, speed, amplitude) and design the data structures required for representing jittered points and shapes.",
-            "dependencies": [],
-            "details": "Establish clear parameter definitions and create data models for points and shapes that will be manipulated by the jitter engine.\n<info added on 2025-06-22T16:04:40.968Z>\nDefine the following data structures for the jitter engine:\n\n```typescript\ninterface Project {\n  layers: Layer[];\n  selectedLayerId: string | null;\n}\n\ninterface Layer {\n  id: string;\n  name: string;\n  type: 'grid' | 'mask';\n  visible: boolean;\n  isClipped: boolean;\n  parameters: {\n    algorithm: 'uniform' | 'noise' | 'recursive' | 'isometric';\n    density: number;\n    gutter: number;\n    colorPalette: string[];\n    // ... other algorithm-specific params\n  };\n  animation: {\n    type: 'none' | 'pulseScale' | 'cycleColor';\n    speed: number;\n    duration: number;\n  };\n}\n```\n\nImplement core parameters for all algorithms:\n- density: controls the number of elements\n- speed: affects animation rate\n- amplitude: determines movement range\n- gutter: defines spacing between elements\n\nEach algorithm type ('uniform', 'noise', 'recursive', 'isometric') will require additional specific parameters to be defined during implementation.\n</info added on 2025-06-22T16:04:40.968Z>",
-            "status": "pending",
-            "testStrategy": "Review parameter documentation and validate data structure integrity through unit tests."
-          },
-          {
-            "id": 2,
-            "title": "Develop Jitter Generation Algorithms",
-            "description": "Implement algorithms to generate jittered points and shapes based on the defined parameters, incorporating deterministic and random jitter components as needed.",
-            "dependencies": [
-              1
-            ],
-            "details": "Use mathematical models and modulation techniques to simulate jitter effects, ensuring flexibility for different jitter types.\n<info added on 2025-06-22T16:05:31.784Z>\nImplement four distinct generative algorithms for the jitter engine:\n1. Uniform Grid - Create evenly spaced points with controlled random displacement\n2. Noise Displacement Grid - Apply Perlin or simplex noise functions to displace grid points\n3. Recursive Subdivision - Generate points through iterative subdivision with varying density\n4. Isometric Grid - Implement triangular/hexagonal grid patterns with controlled jitter\n\nEach algorithm should be modular, well-documented, and include parameters for controlling the amount and character of jitter effects.\n</info added on 2025-06-22T16:05:31.784Z>",
-            "status": "pending",
-            "testStrategy": "Compare generated outputs against expected statistical properties and visual patterns."
-          },
-          {
-            "id": 3,
-            "title": "Integrate Parameter Control and Modulation",
-            "description": "Enable dynamic adjustment of density, speed, and amplitude parameters, allowing real-time modulation of jitter characteristics.",
-            "dependencies": [
-              2
-            ],
-            "details": "Implement interfaces or APIs for parameter updates and ensure the jitter engine responds correctly to changes.\n<info added on 2025-06-22T16:05:59.531Z>\nImplement parameter control integration with Zustand state management. Create a store that maintains all jitter parameters and their current values. Develop subscription mechanisms for the canvas component to reactively respond to parameter changes. Ensure the API supports:\n\n1. Parameter registration with metadata (min/max values, step sizes, default values)\n2. Batch parameter updates for performance optimization\n3. History tracking for undo/redo functionality\n4. Parameter presets for saving and loading configurations\n\nTest the reactivity chain from UI controls through the state store to the rendering engine, verifying that parameter changes result in immediate visual updates without performance degradation.\n</info added on 2025-06-22T16:05:59.531Z>",
-            "status": "pending",
-            "testStrategy": "Test parameter changes during runtime and verify corresponding updates in jittered outputs."
-          },
-          {
-            "id": 4,
-            "title": "Optimize Performance and Resource Usage",
-            "description": "Profile and optimize the jitter engine for computational efficiency and minimal resource consumption, especially for high-density or high-speed scenarios.",
-            "dependencies": [
-              3
-            ],
-            "details": "Identify bottlenecks and refactor code for improved performance without sacrificing output quality.\n<info added on 2025-06-22T16:06:10.943Z>\nPerformance optimization strategies:\n1. Use React.memo selectively on components to prevent unnecessary re-renders when props haven't changed\n2. Implement offscreen canvas buffering for static or infrequently changing visual layers\n3. Profile render cycles to identify and eliminate redundant calculations\n4. Consider implementing a throttling mechanism for high-frequency parameter changes\n5. Separate UI thread from processing thread where possible to maintain responsiveness\n\nThese optimizations should be implemented while maintaining the quality standards for jitter outputs as specified in the PRD.\n</info added on 2025-06-22T16:06:10.943Z>",
-            "status": "pending",
-            "testStrategy": "Benchmark engine performance under various loads and validate output consistency."
-          },
-          {
-            "id": 5,
-            "title": "Validate and Visualize Jittered Outputs",
-            "description": "Develop tools or scripts to visualize jittered points and shapes, and validate the engine's outputs against design requirements.",
-            "dependencies": [
-              4
-            ],
-            "details": "Create visualizations (e.g., plots, diagrams) and perform qualitative and quantitative assessments of jitter patterns.\n<info added on 2025-06-22T16:06:25.301Z>\nImplement real-time visual feedback mechanisms to ensure canvas updates instantly when parameters are manipulated. Validate that visualizations correctly reflect the current state in the data store without perceptible delay. Structure the generated output to maintain clean organization and proper formatting for SVG export compatibility. Test the responsiveness of the visualization system under various parameter change scenarios and data loads to ensure consistent performance.\n</info added on 2025-06-22T16:06:25.301Z>",
-            "status": "pending",
-            "testStrategy": "Conduct visual inspections and automated tests to ensure outputs meet expected jitter characteristics."
-          },
-          {
-            "id": 6,
-            "title": "Implement Layer Compositing & Clipping Logic",
-            "description": "This subtask will cover the logic for processing multiple layers, including their visibility and clipping properties, as defined in the PRD.",
-            "details": "The engine's main loop should iterate through the `layers` array provided in the `Project` state. For each layer, it should generate the pattern based on its parameters and then render it to the canvas. This subtask includes handling the `isClipped` property, where a layer acts as a mask for the one below it.\n<info added on 2025-06-22T16:08:18.468Z>\nThe Jitter Engine should implement a command-based architecture to maintain separation of concerns. Instead of directly rendering to the canvas, the engine will:\n\n1. Process the layer stack, evaluating visibility and clipping masks\n2. Generate a structured list of primitive drawing commands (e.g., `{ type: 'rect', x: 10, y: 10, width: 5, height: 5, color: '#ff0000' }`)\n3. Return this command list as its output\n\nThis approach decouples the engine's generative logic from the rendering implementation. The `P5Sketch` component will be responsible for:\n- Consuming the command list produced by the engine\n- Translating these abstract commands into p5.js-specific drawing function calls\n- Executing the rendering in its `draw` loop\n\nThis separation allows the engine to remain agnostic to the rendering library, making it more maintainable and potentially compatible with different rendering backends in the future.\n</info added on 2025-06-22T16:08:18.468Z>",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 7,
-            "title": "Implement Color Palette Application Logic",
-            "description": "This subtask will ensure the engine applies the `colorPalette` from a layer's parameters to the visual elements it generates.",
-            "details": "The rendering part of the engine for each layer should access the `colorPalette` array from its parameters. Implement logic to cycle through, randomly select, or map colors from the palette to the individual points or shapes being drawn. This should be flexible enough to support different coloring strategies in the future.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 2
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "title": "Implement Canvas Rendering Layer",
-        "description": "Create or complete the Canvas.tsx component to serve as the main drawing surface. Implement efficient rendering logic to visualize the jitter patterns in real time. This will consume the output of the Jitter Engine Core.",
-        "details": "",
-        "testStrategy": "",
-        "status": "pending",
-        "dependencies": [
-          2,
-          "8"
-        ],
-        "priority": "medium",
-        "subtasks": []
-      },
-      {
-        "id": 4,
-        "title": "Connect UI Controls to Jitter Engine",
-        "description": "Wire up the UnifiedControlPanel sliders and controls (density, speed, etc.) to the jitter engine and canvas. Use React state or context to propagate control values to the canvas rendering logic.",
-        "details": "",
-        "testStrategy": "",
-        "status": "pending",
-        "dependencies": [
-          3
-        ],
-        "priority": "medium",
-        "subtasks": []
-      },
-      {
-        "id": 5,
-        "title": "Implement Animation Loop",
-        "description": "If supporting animated jitter, implement a timing/animation loop (e.g., using requestAnimationFrame) to update the canvas based on the current speed and pattern parameters.",
-        "details": "",
-        "testStrategy": "",
-        "status": "pending",
-        "dependencies": [
-          3
-        ],
-        "priority": "medium",
-        "subtasks": []
-      },
-      {
-        "id": 6,
-        "title": "Implement Pattern Extensibility",
-        "description": "Architect the jitter engine to support multiple pattern types (e.g., dots, lines, grids, custom shapes). Allow for easy addition of new jitter algorithms or visual styles in the future.",
-        "details": "",
-        "testStrategy": "",
-        "status": "pending",
-        "dependencies": [
-          2
-        ],
-        "priority": "medium",
-        "subtasks": []
-      },
-      {
-        "id": 7,
-        "title": "Implement Export Feature",
-        "description": "Allow users to save generated patterns as an image file (e.g., PNG or SVG).",
-        "details": "",
-        "testStrategy": "",
-        "status": "pending",
-        "dependencies": [
-          3
-        ],
-        "priority": "medium",
-        "subtasks": []
-      },
-      {
-        "id": 8,
-        "title": "Integrate p5.js for Rendering",
-        "description": "Install the p5.js library and its React wrapper if available (e.g., @p5-wrapper/react). Configure it within the project to be used for all canvas-based rendering and animation.",
-        "details": "",
-        "testStrategy": "",
-        "status": "done",
-        "dependencies": [],
-        "priority": "high",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Install p5.js and React Wrapper Libraries",
-            "description": "Install the p5.js library and a suitable React wrapper (such as react-p5 or @p5-wrapper/react) using npm or yarn.",
-            "dependencies": [],
-            "details": "Use the package manager to add p5.js and the chosen React wrapper to the project dependencies.",
-            "status": "done",
-            "testStrategy": "Verify that the libraries are listed in package.json and can be imported without errors."
-          },
-          {
-            "id": 2,
-            "title": "Configure the Project for p5.js Integration",
-            "description": "Set up the project to support p5.js by importing the libraries and preparing the environment for canvas rendering.",
-            "dependencies": [
-              1
-            ],
-            "details": "Import p5.js and the React wrapper in the main application files. Ensure the project structure supports component-based rendering.",
-            "status": "done",
-            "testStrategy": "Check that the application compiles and runs after the imports, with no conflicts or errors."
-          },
-          {
-            "id": 3,
-            "title": "Implement a Canvas Rendering Component",
-            "description": "Create a React component that uses the p5.js wrapper to render and animate content on a canvas.",
-            "dependencies": [
-              2
-            ],
-            "details": "Develop a component (e.g., <Sketch />) that defines setup and draw functions for p5.js, and integrates it into the main app.",
-            "status": "done",
-            "testStrategy": "Render the component and confirm that a p5.js canvas appears and updates as expected."
-          },
-          {
-            "id": 4,
-            "title": "Integrate and Test Canvas Rendering in Application",
-            "description": "Integrate the p5.js-based component into the main application and verify that all canvas-based rendering and animation work as intended.",
-            "dependencies": [
-              3
-            ],
-            "details": "Replace or supplement existing canvas logic with the new p5.js component, ensuring seamless operation within the React app.",
-            "status": "done",
-            "testStrategy": "Run the application, interact with the canvas, and confirm that rendering and animation behave correctly in all target scenarios."
-          }
-        ]
-      }
-    ],
-    "metadata": {
-      "created": "2025-06-22T02:01:33.891Z",
-      "updated": "2025-06-22T15:37:22.610Z",
-      "description": "Tag created on 6/22/2025"
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Create Application Shell and Layout",
+      "description": "Implement the basic UI shell with the header and unified control panel layout as specified in the PRD.",
+      "details": "This task involves setting up the foundational UI structure for the application:\n\n1. Create the main application container with appropriate CSS grid or flexbox layout\n2. Implement the header component with:\n   - Application logo/name\n   - Navigation menu (if specified in PRD)\n   - User account/profile section (if applicable)\n3. Design the unified control panel layout with:\n   - Consistent spacing and alignment\n   - Placeholder sections for future controls\n   - Responsive design considerations for different screen sizes\n4. Set up basic routing structure (if using a SPA framework)\n5. Implement basic theme variables for colors, typography, and spacing\n6. Ensure accessibility standards are met (proper heading hierarchy, ARIA attributes)\n7. Create reusable layout components that can be extended in future tasks\n\nUse semantic HTML elements and follow the design specifications in the PRD. Ensure the layout is responsive and works across all required browsers and devices.",
+      "testStrategy": "1. Visual inspection against design mockups in the PRD\n2. Verify responsive behavior by testing at multiple viewport sizes (mobile, tablet, desktop)\n3. Check browser compatibility in all required browsers (Chrome, Firefox, Safari, Edge)\n4. Validate HTML structure using browser developer tools\n5. Run accessibility checks using tools like Lighthouse or axe\n6. Verify that the layout accommodates dynamic content without breaking\n7. Test keyboard navigation through the interface\n8. Ensure the application shell renders correctly with no console errors\n9. Verify that the layout structure can be easily extended for future components\n10. Document any deviations from the PRD with justification",
+      "status": "done",
+      "dependencies": [],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Refine Header Component styles for better alignment and spacing.",
+          "description": "Use Tailwind CSS utility classes to ensure the logo, title, and any navigation elements are properly aligned and have consistent spacing.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 1
+        },
+        {
+          "id": 2,
+          "title": "Implement a more robust responsive layout for the main content area using CSS Grid or Flexbox.",
+          "description": "Currently, the main content area might not be handling different screen sizes well. This subtask is to refactor the layout to use modern CSS techniques for a more stable and responsive design.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 1
+        },
+        {
+          "id": 3,
+          "title": "Add visual polish to the UnifiedControlPanel, including shadows and consistent padding.",
+          "description": "This involves adding subtle shadows to create depth, and ensuring all elements within the panel have consistent padding to improve visual hierarchy and organization.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 1
+        },
+        {
+          "id": 4,
+          "title": "Ensure font sizes and weights are consistent across the application shell.",
+          "description": "Review and adjust font sizes and weights throughout the application shell to ensure a consistent and readable typography. This will contribute to a more professional and polished look.",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement Jitter Engine Core",
+      "description": "Implement the core logic for generating jittered points and shapes based on parameters like density, speed, and amplitude. This engine will be the heart of the pattern generation.",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        "8"
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Define Jitter Engine Parameters and Data Structures",
+          "description": "Specify and document the core parameters (density, speed, amplitude) and design the data structures required for representing jittered points and shapes.",
+          "dependencies": [],
+          "details": "Establish clear parameter definitions and create data models for points and shapes that will be manipulated by the jitter engine.\n<info added on 2025-06-22T16:04:40.968Z>\nDefine the following data structures for the jitter engine:\n\n```typescript\ninterface Project {\n  layers: Layer[];\n  selectedLayerId: string | null;\n}\n\ninterface Layer {\n  id: string;\n  name: string;\n  type: 'grid' | 'mask';\n  visible: boolean;\n  isClipped: boolean;\n  parameters: {\n    algorithm: 'uniform' | 'noise' | 'recursive' | 'isometric';\n    density: number;\n    gutter: number;\n    colorPalette: string[];\n    // ... other algorithm-specific params\n  };\n  animation: {\n    type: 'none' | 'pulseScale' | 'cycleColor';\n    speed: number;\n    duration: number;\n  };\n}\n```\n\nImplement core parameters for all algorithms:\n- density: controls the number of elements\n- speed: affects animation rate\n- amplitude: determines movement range\n- gutter: defines spacing between elements\n\nEach algorithm type ('uniform', 'noise', 'recursive', 'isometric') will require additional specific parameters to be defined during implementation.\n</info added on 2025-06-22T16:04:40.968Z>",
+          "status": "pending",
+          "testStrategy": "Review parameter documentation and validate data structure integrity through unit tests."
+        },
+        {
+          "id": 2,
+          "title": "Develop Jitter Generation Algorithms",
+          "description": "Implement algorithms to generate jittered points and shapes based on the defined parameters, incorporating deterministic and random jitter components as needed.",
+          "dependencies": [
+            1
+          ],
+          "details": "Use mathematical models and modulation techniques to simulate jitter effects, ensuring flexibility for different jitter types.\n<info added on 2025-06-22T16:05:31.784Z>\nImplement four distinct generative algorithms for the jitter engine:\n1. Uniform Grid - Create evenly spaced points with controlled random displacement\n2. Noise Displacement Grid - Apply Perlin or simplex noise functions to displace grid points\n3. Recursive Subdivision - Generate points through iterative subdivision with varying density\n4. Isometric Grid - Implement triangular/hexagonal grid patterns with controlled jitter\n\nEach algorithm should be modular, well-documented, and include parameters for controlling the amount and character of jitter effects.\n</info added on 2025-06-22T16:05:31.784Z>",
+          "status": "pending",
+          "testStrategy": "Compare generated outputs against expected statistical properties and visual patterns."
+        },
+        {
+          "id": 3,
+          "title": "Integrate Parameter Control and Modulation",
+          "description": "Enable dynamic adjustment of density, speed, and amplitude parameters, allowing real-time modulation of jitter characteristics.",
+          "dependencies": [
+            2
+          ],
+          "details": "Implement interfaces or APIs for parameter updates and ensure the jitter engine responds correctly to changes.\n<info added on 2025-06-22T16:05:59.531Z>\nImplement parameter control integration with Zustand state management. Create a store that maintains all jitter parameters and their current values. Develop subscription mechanisms for the canvas component to reactively respond to parameter changes. Ensure the API supports:\n\n1. Parameter registration with metadata (min/max values, step sizes, default values)\n2. Batch parameter updates for performance optimization\n3. History tracking for undo/redo functionality\n4. Parameter presets for saving and loading configurations\n\nTest the reactivity chain from UI controls through the state store to the rendering engine, verifying that parameter changes result in immediate visual updates without performance degradation.\n</info added on 2025-06-22T16:05:59.531Z>",
+          "status": "pending",
+          "testStrategy": "Test parameter changes during runtime and verify corresponding updates in jittered outputs."
+        },
+        {
+          "id": 4,
+          "title": "Optimize Performance and Resource Usage",
+          "description": "Profile and optimize the jitter engine for computational efficiency and minimal resource consumption, especially for high-density or high-speed scenarios.",
+          "dependencies": [
+            3
+          ],
+          "details": "Identify bottlenecks and refactor code for improved performance without sacrificing output quality.\n<info added on 2025-06-22T16:06:10.943Z>\nPerformance optimization strategies:\n1. Use React.memo selectively on components to prevent unnecessary re-renders when props haven't changed\n2. Implement offscreen canvas buffering for static or infrequently changing visual layers\n3. Profile render cycles to identify and eliminate redundant calculations\n4. Consider implementing a throttling mechanism for high-frequency parameter changes\n5. Separate UI thread from processing thread where possible to maintain responsiveness\n\nThese optimizations should be implemented while maintaining the quality standards for jitter outputs as specified in the PRD.\n</info added on 2025-06-22T16:06:10.943Z>",
+          "status": "pending",
+          "testStrategy": "Benchmark engine performance under various loads and validate output consistency."
+        },
+        {
+          "id": 5,
+          "title": "Validate and Visualize Jittered Outputs",
+          "description": "Develop tools or scripts to visualize jittered points and shapes, and validate the engine's outputs against design requirements.",
+          "dependencies": [
+            4
+          ],
+          "details": "Create visualizations (e.g., plots, diagrams) and perform qualitative and quantitative assessments of jitter patterns.\n<info added on 2025-06-22T16:06:25.301Z>\nImplement real-time visual feedback mechanisms to ensure canvas updates instantly when parameters are manipulated. Validate that visualizations correctly reflect the current state in the data store without perceptible delay. Structure the generated output to maintain clean organization and proper formatting for SVG export compatibility. Test the responsiveness of the visualization system under various parameter change scenarios and data loads to ensure consistent performance.\n</info added on 2025-06-22T16:06:25.301Z>",
+          "status": "pending",
+          "testStrategy": "Conduct visual inspections and automated tests to ensure outputs meet expected jitter characteristics."
+        },
+        {
+          "id": 6,
+          "title": "Implement Layer Compositing & Clipping Logic",
+          "description": "This subtask will cover the logic for processing multiple layers, including their visibility and clipping properties, as defined in the PRD.",
+          "details": "The engine's main loop should iterate through the `layers` array provided in the `Project` state. For each layer, it should generate the pattern based on its parameters and then render it to the canvas. This subtask includes handling the `isClipped` property, where a layer acts as a mask for the one below it.\n<info added on 2025-06-22T16:08:18.468Z>\nThe Jitter Engine should implement a command-based architecture to maintain separation of concerns. Instead of directly rendering to the canvas, the engine will:\n\n1. Process the layer stack, evaluating visibility and clipping masks\n2. Generate a structured list of primitive drawing commands (e.g., `{ type: 'rect', x: 10, y: 10, width: 5, height: 5, color: '#ff0000' }`)\n3. Return this command list as its output\n\nThis approach decouples the engine's generative logic from the rendering implementation. The `P5Sketch` component will be responsible for:\n- Consuming the command list produced by the engine\n- Translating these abstract commands into p5.js-specific drawing function calls\n- Executing the rendering in its `draw` loop\n\nThis separation allows the engine to remain agnostic to the rendering library, making it more maintainable and potentially compatible with different rendering backends in the future.\n</info added on 2025-06-22T16:08:18.468Z>",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 2
+        },
+        {
+          "id": 7,
+          "title": "Implement Color Palette Application Logic",
+          "description": "This subtask will ensure the engine applies the `colorPalette` from a layer's parameters to the visual elements it generates.",
+          "details": "The rendering part of the engine for each layer should access the `colorPalette` array from its parameters. Implement logic to cycle through, randomly select, or map colors from the palette to the individual points or shapes being drawn. This should be flexible enough to support different coloring strategies in the future.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 2
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Implement Canvas Rendering Layer",
+      "description": "Create or complete the Canvas.tsx component to serve as the main drawing surface. Implement efficient rendering logic to visualize the jitter patterns in real time. This will consume the output of the Jitter Engine Core.",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        2,
+        "8"
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 4,
+      "title": "Connect UI Controls to Jitter Engine",
+      "description": "Wire up the UnifiedControlPanel sliders and controls (density, speed, etc.) to the jitter engine and canvas. Use React state or context to propagate control values to the canvas rendering logic.",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 5,
+      "title": "Implement Animation Loop",
+      "description": "If supporting animated jitter, implement a timing/animation loop (e.g., using requestAnimationFrame) to update the canvas based on the current speed and pattern parameters.",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 6,
+      "title": "Implement Pattern Extensibility",
+      "description": "Architect the jitter engine to support multiple pattern types (e.g., dots, lines, grids, custom shapes). Allow for easy addition of new jitter algorithms or visual styles in the future.",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        2
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "Implement Export Feature",
+      "description": "Allow users to save generated patterns as an image file (e.g., PNG or SVG).",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        3
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "Integrate p5.js for Rendering",
+      "description": "Install the p5.js library and its React wrapper if available (e.g., @p5-wrapper/react). Configure it within the project to be used for all canvas-based rendering and animation.",
+      "details": "",
+      "testStrategy": "",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Install p5.js and React Wrapper Libraries",
+          "description": "Install the p5.js library and a suitable React wrapper (such as react-p5 or @p5-wrapper/react) using npm or yarn.",
+          "dependencies": [],
+          "details": "Use the package manager to add p5.js and the chosen React wrapper to the project dependencies.",
+          "status": "done",
+          "testStrategy": "Verify that the libraries are listed in package.json and can be imported without errors."
+        },
+        {
+          "id": 2,
+          "title": "Configure the Project for p5.js Integration",
+          "description": "Set up the project to support p5.js by importing the libraries and preparing the environment for canvas rendering.",
+          "dependencies": [
+            1
+          ],
+          "details": "Import p5.js and the React wrapper in the main application files. Ensure the project structure supports component-based rendering.",
+          "status": "done",
+          "testStrategy": "Check that the application compiles and runs after the imports, with no conflicts or errors."
+        },
+        {
+          "id": 3,
+          "title": "Implement a Canvas Rendering Component",
+          "description": "Create a React component that uses the p5.js wrapper to render and animate content on a canvas.",
+          "dependencies": [
+            2
+          ],
+          "details": "Develop a component (e.g., <Sketch />) that defines setup and draw functions for p5.js, and integrates it into the main app.",
+          "status": "done",
+          "testStrategy": "Render the component and confirm that a p5.js canvas appears and updates as expected."
+        },
+        {
+          "id": 4,
+          "title": "Integrate and Test Canvas Rendering in Application",
+          "description": "Integrate the p5.js-based component into the main application and verify that all canvas-based rendering and animation work as intended.",
+          "dependencies": [
+            3
+          ],
+          "details": "Replace or supplement existing canvas logic with the new p5.js component, ensuring seamless operation within the React app.",
+          "status": "done",
+          "testStrategy": "Run the application, interact with the canvas, and confirm that rendering and animation behave correctly in all target scenarios."
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Address Technical Debt and Code Quality Issues",
+      "description": "Identify and resolve technical debt, code quality issues, bugs, performance bottlenecks, and security vulnerabilities across the application to improve maintainability and stability.",
+      "details": "This task involves a comprehensive review and improvement of the codebase:\n\n1. Code Quality Assessment:\n   - Run static code analysis tools (ESLint, SonarQube) to identify code smells and anti-patterns\n   - Review component structure for adherence to React best practices\n   - Check for proper TypeScript typing throughout the codebase\n   - Identify areas with insufficient test coverage\n\n2. Performance Optimization:\n   - Profile the application to identify rendering bottlenecks\n   - Optimize p5.js rendering performance, especially for complex patterns\n   - Review and optimize React component re-rendering\n   - Implement memoization where appropriate for expensive calculations\n   - Check for memory leaks, particularly in the animation loop\n\n3. Bug Fixes:\n   - Review and address all open issues in the issue tracker\n   - Focus on edge cases in the jitter engine calculations\n   - Fix any browser compatibility issues\n   - Address responsive design breakpoints\n\n4. Security Enhancements:\n   - Audit dependencies for vulnerabilities\n   - Implement proper input validation for all user inputs\n   - Review export functionality for potential security issues\n   - Ensure proper error handling throughout the application\n\n5. Refactoring:\n   - Improve code organization and modularity\n   - Extract reusable logic into custom hooks or utility functions\n   - Standardize naming conventions across the codebase\n   - Improve documentation with JSDoc comments\n\nThis task will serve as a parent task for specific subtasks targeting individual areas of improvement.",
+      "testStrategy": "1. Code Quality Verification:\n   - Run automated linting and type checking with zero errors/warnings\n   - Conduct peer code reviews for all changes\n   - Verify test coverage metrics meet or exceed 80%\n   - Document before/after metrics for code quality\n\n2. Performance Testing:\n   - Use Chrome DevTools Performance tab to measure and compare rendering times before and after\n   - Create performance benchmarks for the jitter engine with various parameter combinations\n   - Test memory usage during extended animation periods\n   - Verify smooth performance on lower-end devices\n\n3. Bug Verification:\n   - Create regression test cases for each fixed bug\n   - Verify fixes across all supported browsers\n   - Test edge cases with extreme parameter values\n   - Ensure responsive design works at all breakpoints\n\n4. Security Testing:\n   - Run dependency vulnerability scans (npm audit)\n   - Perform penetration testing on user input fields\n   - Verify secure handling of file exports\n   - Test error handling with unexpected inputs\n\n5. Documentation Review:\n   - Verify updated documentation accurately reflects code changes\n   - Ensure all public functions and components have proper JSDoc comments\n   - Update README with any new development guidelines",
+      "status": "pending",
+      "dependencies": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Fix Missing WelcomeVisibilityContext Provider",
+          "description": "The WelcomeVisibilityContext at components/WelcomeVisibilityContext.tsx is defined but has no provider, which will cause runtime errors as it's used in AppShell.tsx.",
+          "details": "Impact: Runtime crash when trying to use the context. Fix: Add a proper provider component for the context and wrap the application with it to ensure the context is available to all consumer components.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 2,
+          "title": "Address Potential P5.js Memory Leak",
+          "description": "There is a potential memory leak in `components/P5Sketch.tsx` because the p5.js instance cleanup may not be complete.",
+          "details": "Impact: Memory leaks on component unmount/remount. Fix: Review the useEffect cleanup function in the P5Sketch component. Ensure `p5InstanceRef.current.remove()` completely disposes of all p5 resources, including sketches and event listeners, to prevent memory leaks.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 3,
+          "title": "Fix Cross-Browser Fullscreen API Typing and Implementation",
+          "description": "The `Canvas.tsx` component is missing type declarations for vendor-prefixed fullscreen methods like `webkitRequestFullscreen`.",
+          "details": "Impact: TypeScript errors and potential runtime issues on different browsers. Fix: Add ambient type declarations for the prefixed fullscreen methods to the `HTMLDivElement` interface or, preferably, integrate a well-maintained library that abstracts away browser inconsistencies for handling fullscreen requests.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 4,
+          "title": "Improve Cookie Parsing in useWelcomeVisibility Hook",
+          "description": "The cookie parsing logic in `hooks/useWelcomeVisibility.ts` is naive and could fail with malformed cookies.",
+          "details": "Impact: Potential for runtime errors if the `document.cookie` string is malformed. Fix: Refactor the cookie parsing logic to be more robust. Use a try-catch block or a more sophisticated parsing method to gracefully handle errors and prevent the application from crashing due to unexpected cookie formats.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 5,
+          "title": "Review and Align Home Page Export Convention",
+          "description": "The use of a default export in `app/page.tsx` appears to violate the project's standard of using named exports.",
+          "details": "Impact: Inconsistent with project standards outlined in documentation. Fix: Review the project's export conventions. While most components should use named exports, Next.js requires page components in the App Router to be default exports. Confirm this exception is acceptable and document it, or refactor the component if it's not intended to be a page.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 6,
+          "title": "Apply React.memo for Performance Optimization",
+          "description": "Large components like `UnifiedControlPanel` and `P5Sketch` may be re-rendering unnecessarily, impacting performance.",
+          "details": "Recommendation: Wrap `UnifiedControlPanel` and `P5Sketch` with `React.memo` to prevent re-renders when their props have not changed. Profile the components before and after applying the memoization to verify a positive impact on performance.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 7,
+          "title": "Optimize Event Listeners in Canvas Component",
+          "description": "The `Canvas.tsx` component adds multiple `keydown` event listeners, which could be consolidated.",
+          "details": "Recommendation: Refactor the event handling in `Canvas.tsx`. Instead of multiple `addEventListener` calls, use a single event delegation pattern on a parent element or consolidate the logic into a single `handleKeyDown` function that manages different key presses. This will improve performance and maintainability.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 8,
+          "title": "Enhance Cookie Security Attributes",
+          "description": "The cookie set in `hooks/useWelcomeVisibility.ts` lacks important security attributes.",
+          "details": "Fix: Update the `document.cookie` assignment in `hooks/useWelcomeVisibility.ts` to include the `SameSite=Strict` and `Secure` attributes. The `Secure` flag should only be applied in a production environment (e.g., by checking `process.env.NODE_ENV === 'production'`). This will help mitigate CSRF and other cookie-based attacks.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 9,
+          "title": "Implement Error Boundaries for Critical Components",
+          "description": "The application lacks error boundaries, meaning a crash in a component like the P5.js sketch could take down the entire app.",
+          "details": "Fix: Create a reusable `ErrorBoundary` component that catches JavaScript errors in its child component tree, logs those errors, and displays a fallback UI. Wrap critical components, especially `P5Sketch` and other dynamic parts of the application, with this `ErrorBoundary` to improve resilience and prevent catastrophic failures.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 10,
+          "title": "Implement Canvas Resizing on Fullscreen Change",
+          "description": "The canvas does not properly resize when toggling fullscreen mode, leading to distorted rendering and incorrect dimensions.",
+          "details": "Implement an event listener for the `fullscreenchange` event on the canvas container. When the event fires, the handler should get the new dimensions of the container and call the p5.js `resizeCanvas()` function with the new width and height. This will ensure the canvas correctly fills the screen when entering fullscreen and returns to its original size when exiting.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 9
+        }
+      ]
     }
+  ],
+  "metadata": {
+    "created": "2025-06-22T02:01:33.891Z",
+    "updated": "2025-06-22T16:15:24.239Z",
+    "description": "Tag created on 6/22/2025"
   }
 }
