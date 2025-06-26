@@ -105,5 +105,39 @@ export class PerlinNoise {
   }
 }
 
-// Global instance
+/**
+ * Thread-safe implementation of Perlin noise generator.
+ *
+ * Creates a new isolated Perlin noise instance to prevent race conditions
+ * when used in concurrent environments such as Web Workers or when multiple
+ * algorithms run simultaneously.
+ *
+ * Each instance maintains its own internal permutation table and state,
+ * ensuring that concurrent operations don't interfere with each other.
+ *
+ * @returns {PerlinNoise} A new isolated Perlin noise instance
+ *
+ * @example
+ * ```typescript
+ * // Thread-safe usage in algorithms
+ * const noiseInstance = createPerlinNoise();
+ * const value = noiseInstance.noise2D(x, y);
+ *
+ * // In a Web Worker context
+ * const workerNoise = createPerlinNoise();
+ * self.onmessage = (e) => {
+ *   const result = workerNoise.noise2D(e.data.x, e.data.y);
+ *   self.postMessage(result);
+ * };
+ * ```
+ *
+ * @since 1.0.0
+ * @see {@link PerlinNoise} For the noise generator class
+ */
+export function createPerlinNoise(): PerlinNoise {
+  return new PerlinNoise()
+}
+
+// Legacy global instance for backward compatibility
+// @deprecated Use createPerlinNoise() for new code to ensure thread safety
 export const perlinNoise = new PerlinNoise()

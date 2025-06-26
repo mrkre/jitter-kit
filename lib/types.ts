@@ -40,6 +40,7 @@ export interface Layer {
   name: string
   type: 'grid' | 'mask'
   visible: boolean
+  locked: boolean
   isClipped: boolean
   parameters: {
     algorithm:

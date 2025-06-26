@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useCallback, memo } from 'react'
 import p5 from 'p5'
 import type { Layer, DrawingCommand } from '@/lib/types'
 import {
@@ -27,7 +27,9 @@ interface P5SketchProps {
   className?: string
 }
 
-export default function P5Sketch({
+// Memoized P5Sketch component to prevent unnecessary re-renders
+// Only re-renders when props actually change
+export const P5Sketch = memo(function P5Sketch({
   params = {
     density: 10,
     speed: 1,
@@ -40,18 +42,22 @@ export default function P5Sketch({
   const containerRef = useRef<HTMLDivElement>(null)
   const p5InstanceRef = useRef<CustomP5 | null>(null)
 
-  // Effect for sketch creation and destruction
+  // Main effect for p5.js instance lifecycle management
+  // This effect only runs once on mount and cleanup on unmount (empty dependency array)
+  // This prevents unnecessary canvas re-creation which improves performance
   useEffect(() => {
     if (!containerRef.current) return
 
     const container = containerRef.current
 
-    // Clear any existing canvas elements
+    // Clean up any existing canvas elements to prevent duplicates
+    // This ensures a clean slate before creating a new p5 instance
     while (container.firstChild) {
       container.removeChild(container.firstChild)
     }
 
-    // Prevent multiple instances - cleanup any existing instance first
+    // Safety check: Remove any existing p5 instance before creating a new one
+    // This prevents memory leaks and multiple canvas instances
     if (p5InstanceRef.current) {
       p5InstanceRef.current.remove()
       p5InstanceRef.current = null
@@ -148,6 +154,7 @@ export default function P5Sketch({
           type: 'grid',
           visible: true,
           isClipped: false,
+          locked: false,
           parameters: {
             algorithm:
               localParams.algorithm as Layer['parameters']['algorithm'],
@@ -396,51 +403,64 @@ export default function P5Sketch({
       }
     }
 
-    // Final safety check before creating new instance
+    // Double-check: Ensure no p5 instance exists before creating a new one
     if (p5InstanceRef.current) {
       ;(p5InstanceRef.current as any).remove()
       p5InstanceRef.current = null
     }
 
+    // Create the p5 instance with our sketch function
     p5InstanceRef.current = new p5(sketch, container) as CustomP5
 
+    // Set up ResizeObserver to handle container size changes
+    // This ensures the canvas always fits its container properly
     const resizeObserver = new ResizeObserver((entries) => {
       if (!entries[0]) return
       const { width, height } = entries[0].contentRect
+      // Only resize if p5 instance exists to prevent errors
       p5InstanceRef.current?.resizeCanvas(width, height)
     })
 
     resizeObserver.observe(container)
 
+    // Cleanup function: This runs when the component unmounts
+    // Proper cleanup prevents memory leaks and ensures smooth re-mounting
     return () => {
+      // Stop observing resize events
       resizeObserver.unobserve(container)
+
+      // Remove the p5 instance completely
       if (p5InstanceRef.current) {
         ;(p5InstanceRef.current as any).remove()
         p5InstanceRef.current = null
       }
-      // Clear any remaining canvas elements
+
+      // Clear any remaining DOM elements as a final cleanup step
       while (container.firstChild) {
         container.removeChild(container.firstChild)
       }
     }
+    // Empty dependency array: This effect runs only once on mount
+    // This is crucial for preventing unnecessary canvas re-creation
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Empty dependency array ensures this runs only once on mount
+  }, [])
 
-  // Effect for updating props
-  useEffect(() => {
-    const updateProps = () => {
-      if (p5InstanceRef.current && p5InstanceRef.current.updateWithProps) {
-        p5InstanceRef.current.updateWithProps({
-          params,
-          selectedLayer,
-        })
-      }
+  // Memoized update function to prevent recreation on every render
+  const updateProps = useCallback(() => {
+    if (p5InstanceRef.current && p5InstanceRef.current.updateWithProps) {
+      p5InstanceRef.current.updateWithProps({
+        params,
+        selectedLayer,
+      })
     }
+  }, [params, selectedLayer])
 
-    // Small delay to ensure P5 instance is fully ready
-    const timeoutId = setTimeout(updateProps, 10)
-    return () => clearTimeout(timeoutId)
-  }, [params, selectedLayer]) // Include selectedLayer in dependencies
+  // Effect for updating props when they change
+  useEffect(() => {
+    // Use requestAnimationFrame for better performance instead of setTimeout
+    const rafId = requestAnimationFrame(updateProps)
+    return () => cancelAnimationFrame(rafId)
+  }, [updateProps])
 
   // Prevent scrolling when interacting with canvas
   useEffect(() => {
@@ -470,4 +490,4 @@ export default function P5Sketch({
       }}
     />
   )
-}
+})

@@ -7,13 +7,7 @@ import {
   useCallback,
   ReactNode,
 } from 'react'
-
-interface Layer {
-  id: string
-  name: string
-  visible: boolean
-  locked: boolean
-}
+import { Layer } from '../lib/types'
 
 interface AlgorithmParams {
   // Common parameters
@@ -136,8 +130,46 @@ export function JitterProvider({ children }: JitterProviderProps) {
     const newLayer: Layer = {
       id: `layer-${Date.now()}`,
       name: `Layer ${layers.length + 1}`,
+      type: 'grid',
       visible: true,
       locked: false,
+      isClipped: false,
+      parameters: {
+        algorithm: params.algorithm as Layer['parameters']['algorithm'],
+        density: params.density,
+        gutter: params.gutter || 5,
+        colorPalette: ['#8B5CF6', '#EC4899', '#3B82F6', '#10B981'],
+        shapeVariety: params.shapeVariety,
+        sizeVariation: params.sizeVariation,
+        displacementIntensity: params.displacementIntensity,
+        colorVariation: params.colorVariation,
+        heightVariation: params.heightVariation,
+        noiseScale: params.noiseScale,
+        octaves: params.octaves,
+        subdivisions: params.subdivisions,
+        threshold: params.threshold,
+        perspective: params.perspective,
+        fieldStrength: params.fieldStrength,
+        flowSpeed: params.flowSpeed,
+        branchLength: params.branchLength,
+        branchAngle: params.branchAngle,
+        iterations: params.iterations,
+        treeCount: params.treeCount,
+        particleCount: params.particleCount,
+        gravity: params.gravity,
+        friction: params.friction,
+        generations: params.generations,
+        survivalRules: params.survivalRules,
+        pattern: params.pattern,
+        axiom: params.axiom,
+        rules: params.rules,
+        angle: params.angle,
+      },
+      animation: {
+        type: params.animationType as Layer['animation']['type'],
+        speed: params.speed,
+        duration: params.duration,
+      },
     }
     setLayers((prev) => [...prev, newLayer])
     setSelectedLayer(newLayer.id)

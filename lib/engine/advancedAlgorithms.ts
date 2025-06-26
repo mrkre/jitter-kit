@@ -3,7 +3,7 @@ import {
   getCanvasSize,
   getRandomColor,
   createColorPalette,
-  perlinNoise,
+  createPerlinNoise,
 } from './algorithmUtils'
 
 // 1. Perlin Noise Fields Algorithm
@@ -16,6 +16,9 @@ export const generatePerlinNoiseFields = (layer: Layer): DrawingCommand[] => {
     fieldStrength = 1,
   } = layer.parameters
   const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = getCanvasSize(layer)
+
+  // Create isolated Perlin noise instance for thread safety
+  const perlinNoiseInstance = createPerlinNoise()
 
   // Ensure good resolution scaling across different canvas sizes
   const baseResolution = Math.max(8, Math.min(CANVAS_WIDTH, CANVAS_HEIGHT) / 20)
@@ -36,7 +39,9 @@ export const generatePerlinNoiseFields = (layer: Layer): DrawingCommand[] => {
 
       // Get noise value for flow direction
       const angle =
-        perlinNoise.noise2D(px * flowSpeed, py * flowSpeed) * Math.PI * 2
+        perlinNoiseInstance.noise2D(px * flowSpeed, py * flowSpeed) *
+        Math.PI *
+        2
       const length = resolution * 0.7 * fieldStrength
 
       const endX = px + Math.cos(angle) * length
@@ -52,7 +57,12 @@ export const generatePerlinNoiseFields = (layer: Layer): DrawingCommand[] => {
         color: getRandomColor(createColorPalette(colorPalette)),
         strokeWeight: Math.max(
           0.5,
-          1 + perlinNoise.noise2D(px * flowSpeed * 2, py * flowSpeed * 2) * 2
+          1 +
+            perlinNoiseInstance.noise2D(
+              px * flowSpeed * 2,
+              py * flowSpeed * 2
+            ) *
+              2
         ),
         alpha: 0.7,
       })
