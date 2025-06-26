@@ -410,6 +410,130 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Migrate to Three.js for Advanced Layer Blending and Shader Effects",
+        "description": "Migrate the rendering system from p5.js to Three.js/React Three Fiber to enable advanced layer blending modes and shader-based effects for more sophisticated generative art capabilities.",
+        "details": "This task involves migrating from the current p5.js-based rendering system to Three.js with React Three Fiber to unlock advanced compositing capabilities:\n\n1. **Strategic Goals:**\n   - Enable advanced blend modes (multiply, screen, overlay, difference, etc.)\n   - Implement custom shader effects for layer interactions\n   - Add real-time post-processing capabilities\n   - Maintain current algorithm functionality while gaining GPU acceleration\n\n2. **Technical Approach:**\n   - Start with hybrid architecture (keep p5.js algorithms, add Three.js compositing)\n   - Convert drawing commands to Three.js geometries\n   - Implement shader-based layer blending system\n   - Add post-processing pipeline for effects\n\n3. **Creative Possibilities:**\n   - Photoshop-style blend modes between layers\n   - Displacement mapping using one layer to distort another\n   - Real-time noise-based distortions and color transformations\n   - Feedback loops where previous frames influence current rendering\n   - Interactive effects triggered by user interaction\n\n4. **Performance Benefits:**\n   - GPU acceleration for handling thousands of objects\n   - Hardware-accelerated compositing and effects\n   - Efficient instanced rendering for repeated elements\n\nThis migration represents a significant enhancement to the creative capabilities of the application while maintaining the proven algorithm engine.",
+        "testStrategy": "1. Ensure all existing algorithms render identically in Three.js\n2. Verify layer blending modes produce expected visual results\n3. Test performance with complex shader combinations\n4. Validate responsive behavior and canvas management\n5. Check memory usage and cleanup with Three.js scenes\n6. Test export functionality with new rendering pipeline\n7. Ensure React integration maintains stable component lifecycle\n8. Validate all user interactions and parameter updates work correctly",
+        "status": "pending",
+        "dependencies": [
+          2,
+          11,
+          14
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Configure Three.js Dependencies",
+            "description": "Install Three.js, React Three Fiber, and related packages needed for the migration.",
+            "details": "Install the core Three.js ecosystem packages:\n- `three` - Core Three.js library\n- `@react-three/fiber` - React renderer for Three.js\n- `@react-three/drei` - Collection of useful helpers and components\n- `@react-three/postprocessing` - Post-processing effects\n- `@types/three` - TypeScript definitions\n\nConfigure Next.js to handle Three.js imports and ensure compatibility with SSR.",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16
+          },
+          {
+            "id": 2,
+            "title": "Design Hybrid Architecture with p5.js Algorithm Preservation",
+            "description": "Create architecture that keeps existing p5.js algorithms while adding Three.js for compositing and effects.",
+            "details": "Design a hybrid system where:\n1. Current algorithm engine continues to generate DrawingCommand arrays\n2. New Three.js layer system renders these commands to off-screen textures\n3. Three.js handles final compositing with blend modes and effects\n4. Maintain backward compatibility with existing parameter system\n\nThis approach minimizes risk by preserving proven algorithm implementations while gaining Three.js benefits.",
+            "status": "pending",
+            "dependencies": [1],
+            "parentTaskId": 16
+          },
+          {
+            "id": 3,
+            "title": "Implement Layer Type System with Blending Modes",
+            "description": "Extend the Layer interface to support Three.js blending modes and shader effects.",
+            "details": "Update the Layer interface to include:\n```typescript\ninterface Layer {\n  // ... existing properties\n  blending: {\n    mode: 'normal' | 'multiply' | 'screen' | 'overlay' | 'difference' | 'exclusion' | 'colorDodge' | 'colorBurn'\n    strength: number\n    customShader?: string\n  }\n  effects: {\n    displacement?: { texture: string, strength: number }\n    colorGrading?: { hue: number, saturation: number, brightness: number }\n    distortion?: { type: 'noise' | 'ripple' | 'wave', intensity: number, frequency: number }\n    glow?: { strength: number, radius: number }\n  }\n  transform: {\n    position: { x: number, y: number }\n    rotation: number\n    scale: { x: number, y: number }\n  }\n}\n```",
+            "status": "pending",
+            "dependencies": [2],
+            "parentTaskId": 16
+          },
+          {
+            "id": 4,
+            "title": "Create Drawing Command to Three.js Geometry Converter",
+            "description": "Implement system to convert current DrawingCommand arrays to Three.js geometries and materials.",
+            "details": "Create conversion functions:\n1. `commandsToGeometry()` - Convert drawing commands to BufferGeometry\n2. `createMaterialFromCommands()` - Generate appropriate Three.js materials\n3. `optimizeGeometry()` - Merge similar shapes for performance\n4. Handle all current drawing command types: rect, ellipse, line, triangle, quad, path, particle, polygon\n\nEnsure visual fidelity matches current p5.js output exactly.",
+            "status": "pending",
+            "dependencies": [3],
+            "parentTaskId": 16
+          },
+          {
+            "id": 5,
+            "title": "Implement Basic Blend Mode Shaders",
+            "description": "Create GLSL shaders for standard Photoshop-style blend modes.",
+            "details": "Implement shader programs for:\n- **Multiply**: `result = base * overlay`\n- **Screen**: `result = 1 - (1 - base) * (1 - overlay)`\n- **Overlay**: Combination of multiply and screen based on base values\n- **Difference**: `result = abs(base - overlay)`\n- **Exclusion**: Similar to difference but with lower contrast\n- **Color Dodge/Burn**: High contrast creative effects\n\nCreate a unified shader system that can switch between modes via uniforms.",
+            "status": "pending",
+            "dependencies": [4],
+            "parentTaskId": 16
+          },
+          {
+            "id": 6,
+            "title": "Build React Three Fiber Canvas Component",
+            "description": "Create the main Three.js canvas component that replaces the current p5.js Canvas.",
+            "details": "Implement `ThreeCanvas.tsx` component with:\n1. **Camera Setup**: Orthographic camera for 2D rendering\n2. **Scene Management**: Layer rendering order and visibility\n3. **Responsive Sizing**: Match current canvas behavior\n4. **Event Handling**: Mouse/keyboard interactions\n5. **Performance Optimizations**: Frame limiting and efficient updates\n\nIntegrate with existing fullscreen functionality and maintain stable component lifecycle.",
+            "status": "pending",
+            "dependencies": [5],
+            "parentTaskId": 16
+          },
+          {
+            "id": 7,
+            "title": "Implement Layer Mesh System with Blend Mode Support",
+            "description": "Create individual mesh components for each layer that support different blend modes.",
+            "details": "Create `LayerMesh.tsx` components that:\n1. **Render Algorithms**: Convert algorithm output to Three.js meshes\n2. **Blend Mode Application**: Apply shader-based blending\n3. **Real-time Updates**: Handle parameter changes without remounting\n4. **Performance**: Use instancing for repeated elements\n5. **Memory Management**: Proper geometry and texture disposal\n\nEnsure each layer can be toggled, reordered, and independently controlled.",
+            "status": "pending",
+            "dependencies": [6],
+            "parentTaskId": 16
+          },
+          {
+            "id": 8,
+            "title": "Add Post-Processing Effects Pipeline",
+            "description": "Implement post-processing effects using @react-three/postprocessing for global visual enhancements.",
+            "details": "Implement effects pipeline with:\n1. **Bloom**: Luminous glow effects for bright areas\n2. **Chromatic Aberration**: RGB channel separation for artistic effect\n3. **Color Grading**: HSV adjustments and tone mapping\n4. **Noise/Film Grain**: Texture and vintage effects\n5. **Convolution Filters**: Blur, sharpen, edge detection\n\nMake effects configurable per project and allow real-time adjustment.",
+            "status": "pending",
+            "dependencies": [7],
+            "parentTaskId": 16
+          },
+          {
+            "id": 9,
+            "title": "Implement Advanced Shader Effects",
+            "description": "Create custom shaders for advanced layer interactions and distortion effects.",
+            "details": "Implement advanced effects:\n1. **Displacement Mapping**: Use one layer to displace another spatially\n2. **Flow Fields**: Particle systems influenced by noise fields\n3. **Feedback Loops**: Current frame influences next frame rendering\n4. **Color Space Transformations**: HSV manipulation and color cycling\n5. **Procedural Distortions**: Real-time warping using noise functions\n\nCreate user-friendly controls for adjusting shader parameters in real-time.",
+            "status": "pending",
+            "dependencies": [8],
+            "parentTaskId": 16
+          },
+          {
+            "id": 10,
+            "title": "Integrate Three.js System with Existing UI Controls",
+            "description": "Update the UnifiedControlPanel and JitterContext to work with the new Three.js rendering system.",
+            "details": "Modify UI integration:\n1. **Layer Controls**: Add blend mode selectors and effect controls\n2. **Real-time Updates**: Ensure parameter changes trigger Three.js updates\n3. **Performance**: Maintain smooth interaction during parameter adjustment\n4. **Presets**: Save/load blend mode and effect combinations\n5. **Export**: Update export functionality for Three.js rendering\n\nMaintain backward compatibility with existing parameter system.",
+            "status": "pending",
+            "dependencies": [9],
+            "parentTaskId": 16
+          },
+          {
+            "id": 11,
+            "title": "Performance Testing and Optimization",
+            "description": "Test and optimize the Three.js implementation for smooth performance across devices.",
+            "details": "Comprehensive performance testing:\n1. **Frame Rate Monitoring**: Ensure 60fps with complex layer combinations\n2. **Memory Usage**: Profile and optimize GPU memory consumption\n3. **Mobile Performance**: Test on lower-end devices\n4. **Batch Optimization**: Group similar geometries for efficient rendering\n5. **Level of Detail**: Reduce complexity when layers are small or distant\n\nImplement performance monitoring and adaptive quality controls.",
+            "status": "pending",
+            "dependencies": [10],
+            "parentTaskId": 16
+          },
+          {
+            "id": 12,
+            "title": "Migration Testing and Quality Assurance",
+            "description": "Comprehensive testing to ensure the Three.js system maintains all current functionality while adding new capabilities.",
+            "details": "Complete testing suite:\n1. **Visual Regression**: Ensure all algorithms render identically\n2. **Feature Parity**: Verify all current features work with Three.js\n3. **Blend Mode Validation**: Test all blend modes produce expected results\n4. **Cross-browser Testing**: Ensure WebGL compatibility\n5. **User Acceptance Testing**: Validate improved creative workflow\n\nDocument any differences and ensure they represent improvements rather than regressions.",
+            "status": "pending",
+            "dependencies": [11],
+            "parentTaskId": 16
+          }
+        ]
       }
     ],
     "metadata": {
