@@ -72,138 +72,114 @@ export const generatePerlinNoiseFields = (layer: Layer): DrawingCommand[] => {
   return commands
 }
 
-// 2. Clean Mathematical Fractal Trees Algorithm
+// 2. Clean Mathematical Fractal Trees Algorithm (Refactored per https://www.jernesto.com/articles/fractal_trees)
 export const generateFractalTrees = (layer: Layer): DrawingCommand[] => {
   const commands: DrawingCommand[] = []
   const {
     colorPalette,
-    branchLength = 0.8,
-    branchAngle = 25,
-    iterations = 6,
+    branchLength = 0.7, // scaling factor per article
+    branchAngle = 30, // degrees, default to 30 for a classic look
+    iterations = 10, // recursion depth
     treeCount = 3,
-    treeSize = 1.0,
-    treeHeight = 1.0,
+    // Only use the above parameters for fractal trees
   } = layer.parameters
   const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT } = getCanvasSize(layer)
 
-  // Performance safety
-  const MAX_COMMANDS = 3000
-  let commandCount = 0
+  // Safe fallback for scalingExponent
+  const scalingExponent =
+    typeof layer.parameters?.scalingExponent === 'number'
+      ? layer.parameters.scalingExponent
+      : 2.0 // alpha, Da Vinci's rule by default (see Gao & Newberry 2024)
 
-  const angleRad = (branchAngle * Math.PI) / 180
-  const maxDepth = Math.max(3, Math.min(iterations, 8))
-
-  // Mathematical constants
-  const GOLDEN_RATIO = 1.618033988749
-  const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
-
-  // Clean mathematical branching function
-  const drawMathematicalBranch = (
-    x: number,
-    y: number,
-    length: number,
-    angle: number,
-    depth: number
-  ) => {
-    if (depth === 0 || length < 2 || commandCount >= MAX_COMMANDS) return
-    commandCount++
-
-    const endX = x + Math.cos(angle) * length
-    const endY = y + Math.sin(angle) * length
-
-    // Bounds check
-    if (
-      endX < -100 ||
-      endX > CANVAS_WIDTH + 100 ||
-      endY < -100 ||
-      endY > CANVAS_HEIGHT + 100
-    )
-      return
-
-    commands.push({
-      type: 'line',
-      position: { x, y },
-      points: [
-        { x, y },
-        { x: endX, y: endY },
-      ],
-      color: getRandomColor(createColorPalette(colorPalette)),
-      strokeWeight: Math.max(0.5, depth * 0.5),
-      alpha: 0.8,
-    })
-
-    if (depth <= 1) return
-
-    // Mathematical length scaling - clean exponential decay
-    const newLength = length * branchLength
-
-    // 1. Binary fractal branches (classic mathematical base)
-    const leftAngle = angle - angleRad
-    const rightAngle = angle + angleRad
-
-    drawMathematicalBranch(endX, endY, newLength, leftAngle, depth - 1)
-    drawMathematicalBranch(endX, endY, newLength, rightAngle, depth - 1)
-
-    // 2. Golden ratio branch (mathematical precision - no randomness)
-    if (depth > 2) {
-      const goldenBranchAngle = angle + GOLDEN_ANGLE * Math.sin(depth * 0.5)
-      const goldenLength = newLength / GOLDEN_RATIO
-      drawMathematicalBranch(
-        endX,
-        endY,
-        goldenLength,
-        goldenBranchAngle,
-        depth - 1
-      )
-    }
-
-    // 3. Fibonacci spiral branch (deterministic pattern)
-    if (depth % 2 === 0 && depth > 1) {
-      const fibonacciAngle = angle + depth * GOLDEN_ANGLE * 0.6
-      const fibonacciLength = newLength * 0.75
-      drawMathematicalBranch(
-        endX,
-        endY,
-        fibonacciLength,
-        fibonacciAngle,
-        depth - 1
-      )
-    }
-
-    // 4. Mathematical tertiary branch (logarithmic pattern)
-    if (depth > 3) {
-      const tertiaryAngle = angle + Math.log(depth) * angleRad
-      const tertiaryLength = newLength / GOLDEN_RATIO
-      drawMathematicalBranch(
-        endX,
-        endY,
-        tertiaryLength,
-        tertiaryAngle,
-        depth - 1
-      )
+  // Helper: rotate a 2D vector (x, y) by theta radians
+  function rotateVec(vec: { x: number; y: number }, theta: number) {
+    const cos = Math.cos(theta)
+    const sin = Math.sin(theta)
+    return {
+      x: vec.x * cos - vec.y * sin,
+      y: vec.x * sin + vec.y * cos,
     }
   }
 
-  // Generate clean mathematical fractal trees
-  const finalTreeCount = Math.min(treeCount, 5) // Max 5 trees for clarity
+  // Helper: add two vectors
+  function addVec(a: { x: number; y: number }, b: { x: number; y: number }) {
+    return { x: a.x + b.x, y: a.y + b.y }
+  }
 
+  // Recursive fractal tree function with thickness scaling law (see Gao & Newberry 2024)
+  function drawFractalBranch(
+    origin: { x: number; y: number },
+    end: { x: number; y: number },
+    angle: number, // radians
+    scale: number,
+    depth: number,
+    thickness: number
+  ) {
+    if (depth === 0 || thickness < 0.5) return
+
+    // Draw the branch (from origin to end)
+    commands.push({
+      type: 'line',
+      position: { x: origin.x, y: origin.y },
+      points: [
+        { x: origin.x, y: origin.y },
+        { x: end.x, y: end.y },
+      ],
+      color: getRandomColor(createColorPalette(colorPalette)),
+      strokeWeight: thickness,
+      alpha: 0.8,
+    })
+
+    // Calculate the branch vector (as a complex number)
+    const branchVec = { x: end.x - origin.x, y: end.y - origin.y }
+    // Scale the branch
+    const scaledVec = { x: branchVec.x * scale, y: branchVec.y * scale }
+
+    // Compute child thickness using the scaling law: t' = t / 2^(1/alpha)
+    const childThickness = thickness / Math.pow(2, 1 / scalingExponent)
+
+    // Left child: rotate by +angle
+    const leftVec = rotateVec(scaledVec, angle)
+    const leftEnd = addVec(end, leftVec)
+    // Right child: rotate by -angle
+    const rightVec = rotateVec(scaledVec, -angle)
+    const rightEnd = addVec(end, rightVec)
+
+    // Recurse for children
+    drawFractalBranch(end, leftEnd, angle, scale, depth - 1, childThickness)
+    drawFractalBranch(end, rightEnd, angle, scale, depth - 1, childThickness)
+  }
+
+  // Main: draw multiple trees spaced across the canvas
+  const finalTreeCount = Math.min(treeCount, 5)
+  // Center the group of trees horizontally
+  const groupWidth = CANVAS_WIDTH * 0.7
+  const groupStart = (CANVAS_WIDTH - groupWidth) / 2
   for (let i = 0; i < finalTreeCount; i++) {
-    // Strategic positioning - well spaced across canvas
+    // Evenly space trees horizontally, centered as a group
     const x =
-      CANVAS_WIDTH * (0.15 + (i / Math.max(finalTreeCount - 1, 1)) * 0.7)
-    const y = CANVAS_HEIGHT * 0.85
-
-    // Large, prominent tree size for mathematical visibility
+      groupStart +
+      groupWidth * (finalTreeCount === 1 ? 0.5 : i / (finalTreeCount - 1))
+    // Anchor the base of the trunk near the bottom of the canvas
+    const y = CANVAS_HEIGHT * 0.9
+    // Scale baseLength so deeper trees don't overflow the canvas
+    // The factor 0.85^n shrinks the tree as iterations increases
+    // Multiply by 1.3 to make the trunk longer and tree more prominent
     const baseLength =
-      Math.min(CANVAS_HEIGHT * 0.5, 200) * treeSize * treeHeight
-    const startAngle = -Math.PI / 2 // Straight up
-
-    // Generate clean mathematical fractal tree
-    drawMathematicalBranch(x, y, baseLength, startAngle, maxDepth)
+      Math.min(CANVAS_HEIGHT * 0.5, 200) *
+      Math.pow(0.85, Math.max(0, iterations - 6)) *
+      1.3
+    const start = { x, y }
+    const end = { x, y: y - baseLength }
+    // Convert angle to radians
+    const angleRad = (branchAngle * Math.PI) / 180
+    // Draw the tree with a fixed initial thickness (e.g., 8)
+    drawFractalBranch(start, end, angleRad, branchLength, iterations, 8)
   }
 
   return commands
 }
+
 export const generateParticleSystem = (layer: Layer): DrawingCommand[] => {
   const commands: DrawingCommand[] = []
   const {

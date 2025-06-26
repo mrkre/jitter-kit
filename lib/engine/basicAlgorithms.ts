@@ -644,14 +644,6 @@ export const generateRecursiveSubdivision = (
     }
   }
 
-  // Log performance warnings if limits were hit
-  if (totalElementCount >= MAX_TOTAL_ELEMENTS) {
-    console.warn(
-      `Recursive subdivision hit maximum element limit (${MAX_TOTAL_ELEMENTS}). ` +
-        'Consider reducing numColumns/numRows or solidBarCount for exponential mode.'
-    )
-  }
-
   return commands
 }
 

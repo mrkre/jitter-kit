@@ -44,6 +44,7 @@ interface AlgorithmParams {
   branchLength?: number
   iterations?: number
   treeCount?: number
+  scalingExponent?: number
   // Particle specific
   particleCount?: number
   gravity?: number
@@ -114,6 +115,7 @@ export function JitterProvider({ children }: JitterProviderProps) {
     branchLength: 0.7,
     iterations: 6,
     treeCount: 8,
+    scalingExponent: 2.0,
     // Particle specific
     particleCount: 100,
     gravity: 0.2,
@@ -173,6 +175,7 @@ export function JitterProvider({ children }: JitterProviderProps) {
         branchAngle: params.branchAngle,
         iterations: params.iterations,
         treeCount: params.treeCount,
+        scalingExponent: params.scalingExponent,
         particleCount: params.particleCount,
         gravity: params.gravity,
         friction: params.friction,

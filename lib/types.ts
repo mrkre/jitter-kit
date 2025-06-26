@@ -88,10 +88,7 @@ export interface Layer {
     branchAngle?: number // Branching angle in degrees
     iterations?: number // Number of recursive iterations
     treeCount?: number // Number of trees to generate
-    rootDepth?: number // Depth of root system
-    windStrength?: number // Wind effect strength (0-1)
-    treeSize?: number // Overall tree size multiplier
-    treeHeight?: number // Tree height multiplier
+    scalingExponent?: number // Scaling exponent (α) for branch thickness
     // Particle specific
     gravity?: number
     friction?: number
