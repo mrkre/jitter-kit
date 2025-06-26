@@ -98,15 +98,79 @@
         "id": 3,
         "title": "Implement Canvas Rendering Layer",
         "description": "Create or complete the Canvas.tsx component to serve as the main drawing surface. Implement efficient rendering logic to visualize the jitter patterns in real time. This will consume the output of the Jitter Engine Core.",
-        "details": "",
-        "testStrategy": "",
+        "details": "This task involves creating a robust canvas rendering system that bridges the jitter engine output with visual display. The canvas component will be responsible for translating drawing commands from the engine into actual rendered patterns, managing multiple layers, and providing smooth real-time updates.",
+        "testStrategy": "1. Verify canvas renders basic shapes correctly\n2. Test layer visibility and ordering functionality\n3. Validate real-time parameter updates reflect in canvas\n4. Check performance with high-density patterns\n5. Test fullscreen mode integration\n6. Verify proper cleanup on component unmount\n7. Test responsive canvas sizing\n8. Validate drawing command execution accuracy",
         "status": "pending",
         "dependencies": [
           2,
           8
         ],
         "priority": "medium",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Complete Canvas.tsx Component Structure",
+            "description": "Set up the basic Canvas component with proper React integration, refs, and lifecycle management.",
+            "details": "Implement the foundational structure for the Canvas component:\n\n1. **Component Setup:**\n   - Create or refactor Canvas.tsx with proper TypeScript interfaces\n   - Set up canvas ref management for direct DOM access\n   - Implement proper component props interface\n   - Add error boundary integration\n\n2. **React Integration:**\n   - Use useRef for canvas element access\n   - Implement useEffect hooks for mounting/unmounting\n   - Add proper cleanup functions to prevent memory leaks\n   - Handle component re-renders efficiently\n\n3. **Canvas Initialization:**\n   - Set up canvas context (2D or WebGL as needed)\n   - Configure canvas size and scaling\n   - Handle device pixel ratio for crisp rendering\n   - Set default canvas styling and attributes\n\n4. **Props Interface:**\n   - Define clear interface for canvas props\n   - Support dimension props (width, height)\n   - Add optional styling and className props\n   - Include callback props for events",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 3
+          },
+          {
+            "id": 2,
+            "title": "Implement Jitter Engine Output Consumption",
+            "description": "Connect the canvas to the jitter engine's drawing command output system.",
+            "details": "Create the bridge between the jitter engine and canvas rendering:\n\n1. **Drawing Command Interface:**\n   - Import and use the DrawingCommand types from the engine\n   - Set up subscription to engine output updates\n   - Handle different command types (rect, ellipse, line, etc.)\n   - Implement command validation and error handling\n\n2. **Engine Integration:**\n   - Connect to JitterContext for layer data\n   - Subscribe to parameter changes from the state store\n   - Handle multiple layers and their individual commands\n   - Implement proper data flow from engine to canvas\n\n3. **Command Processing:**\n   - Create command parser for different drawing primitives\n   - Handle coordinate transformations if needed\n   - Process color and styling information\n   - Batch similar commands for performance\n\n4. **Update Mechanism:**\n   - Implement efficient update triggers\n   - Handle selective re-rendering when needed\n   - Manage frame rate and update frequency\n   - Add debugging and logging capabilities",
+            "status": "pending",
+            "dependencies": [1],
+            "parentTaskId": 3
+          },
+          {
+            "id": 3,
+            "title": "Implement Real-time Rendering Logic",
+            "description": "Translate drawing commands from the engine into actual p5.js rendering calls.",
+            "details": "Implement the core rendering system that executes drawing commands:\n\n1. **Command Execution:**\n   - Map DrawingCommand types to p5.js functions\n   - Handle rect, ellipse, line, triangle, quad, path, particle commands\n   - Implement proper coordinate and size transformations\n   - Apply colors, strokes, and fill styles correctly\n\n2. **P5.js Integration:**\n   - Set up p5.js sketch within the React component\n   - Implement setup() and draw() functions\n   - Handle canvas resizing and responsive behavior\n   - Manage p5.js instance lifecycle properly\n\n3. **Rendering Pipeline:**\n   - Clear canvas before each frame\n   - Execute commands in proper order\n   - Handle layer-specific rendering\n   - Implement efficient batching of similar operations\n\n4. **Visual Quality:**\n   - Ensure smooth anti-aliasing\n   - Handle high DPI displays correctly\n   - Optimize rendering for performance\n   - Maintain visual consistency across browsers",
+            "status": "pending",
+            "dependencies": [2],
+            "parentTaskId": 3
+          },
+          {
+            "id": 4,
+            "title": "Add Canvas Lifecycle Management",
+            "description": "Handle canvas mounting, unmounting, resizing, and state management properly.",
+            "details": "Implement robust lifecycle management for the canvas component:\n\n1. **Component Lifecycle:**\n   - Handle component mounting and setup\n   - Implement proper unmounting and cleanup\n   - Manage component updates and re-renders\n   - Handle props changes gracefully\n\n2. **Canvas State Management:**\n   - Track canvas dimensions and scaling\n   - Manage animation state (playing/paused)\n   - Handle layer visibility states\n   - Store rendering preferences and settings\n\n3. **Resize Handling:**\n   - Implement responsive canvas sizing\n   - Handle window resize events\n   - Maintain aspect ratio if needed\n   - Update p5.js canvas size dynamically\n\n4. **Memory Management:**\n   - Clean up p5.js instances properly\n   - Remove event listeners on unmount\n   - Clear any timers or intervals\n   - Dispose of graphics buffers and textures\n\n5. **Error Recovery:**\n   - Handle rendering errors gracefully\n   - Implement fallback rendering modes\n   - Provide user feedback for issues\n   - Log errors for debugging",
+            "status": "pending",
+            "dependencies": [3],
+            "parentTaskId": 3
+          },
+          {
+            "id": 5,
+            "title": "Implement Layer Visibility and Ordering",
+            "description": "Support rendering multiple layers with proper visibility controls and z-ordering.",
+            "details": "Add comprehensive layer management to the canvas rendering:\n\n1. **Layer Rendering:**\n   - Render layers in correct z-order\n   - Handle layer visibility toggles\n   - Support layer opacity/alpha values\n   - Implement layer isolation for debugging\n\n2. **Layer Management:**\n   - Subscribe to layer state changes\n   - Handle layer addition and removal\n   - Update rendering when layer order changes\n   - Manage layer-specific rendering contexts\n\n3. **Visual Feedback:**\n   - Highlight selected layer (optional)\n   - Show layer boundaries in debug mode\n   - Provide visual indicators for invisible layers\n   - Handle empty layer states gracefully\n\n4. **Performance Optimization:**\n   - Skip rendering for invisible layers\n   - Cache layer output when appropriate\n   - Minimize unnecessary layer updates\n   - Optimize for large numbers of layers",
+            "status": "pending",
+            "dependencies": [4],
+            "parentTaskId": 3
+          },
+          {
+            "id": 6,
+            "title": "Add Performance Optimizations",
+            "description": "Implement efficient update mechanisms and frame management for smooth rendering.",
+            "details": "Optimize canvas performance for smooth real-time rendering:\n\n1. **Frame Rate Management:**\n   - Implement adaptive frame rate control\n   - Add frame rate monitoring and display\n   - Handle performance degradation gracefully\n   - Provide quality vs. performance options\n\n2. **Update Optimization:**\n   - Implement dirty region tracking\n   - Skip rendering when no changes occur\n   - Use requestAnimationFrame efficiently\n   - Batch multiple parameter updates\n\n3. **Memory Optimization:**\n   - Reuse graphics objects when possible\n   - Implement object pooling for frequently created items\n   - Minimize garbage collection impact\n   - Monitor memory usage patterns\n\n4. **Rendering Optimizations:**\n   - Use off-screen rendering when beneficial\n   - Implement level-of-detail rendering\n   - Optimize drawing operations for GPU\n   - Cache static elements when possible",
+            "status": "pending",
+            "dependencies": [5],
+            "parentTaskId": 3
+          },
+          {
+            "id": 7,
+            "title": "Integrate with Fullscreen Functionality",
+            "description": "Connect the canvas with existing fullscreen features and handle fullscreen-specific rendering.",
+            "details": "Integrate canvas rendering with fullscreen mode:\n\n1. **Fullscreen Integration:**\n   - Connect with existing fullscreen toggle functionality\n   - Handle canvas resizing during fullscreen transitions\n   - Maintain rendering quality in fullscreen mode\n   - Update canvas dimensions correctly\n\n2. **Responsive Behavior:**\n   - Adapt rendering to fullscreen dimensions\n   - Handle different screen sizes and orientations\n   - Maintain aspect ratio or fill screen as appropriate\n   - Update UI elements for fullscreen context\n\n3. **Event Handling:**\n   - Handle fullscreen change events\n   - Update canvas state on fullscreen exit/enter\n   - Manage keyboard shortcuts in fullscreen\n   - Handle browser fullscreen API differences\n\n4. **User Experience:**\n   - Provide smooth transitions to/from fullscreen\n   - Maintain parameter controls in fullscreen\n   - Show appropriate UI indicators\n   - Handle edge cases and browser differences",
+            "status": "pending",
+            "dependencies": [6],
+            "parentTaskId": 3
+          }
+        ]
       },
       {
         "id": 4,
@@ -119,7 +183,17 @@
           3
         ],
         "priority": "medium",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Layer Removal Functionality",
+            "description": "Add the ability to remove/delete layers from the layer panel, including confirmation dialogs and proper state cleanup.",
+            "details": "This subtask involves implementing layer removal functionality in the UI:\n\n1. **UI Components:**\n   - Add delete/remove button to each layer item in the layer panel\n   - Implement confirmation dialog to prevent accidental deletion\n   - Add keyboard shortcut support (e.g., Delete key when layer is selected)\n   - Consider bulk deletion for multiple selected layers\n\n2. **State Management:**\n   - Update JitterContext to include `removeLayer(layerId: string)` function\n   - Handle cleanup of layer-specific state and parameters\n   - Update selectedLayer state if the currently selected layer is removed\n   - Ensure proper array updates to maintain layer order\n\n3. **User Experience:**\n   - Show confirmation dialog with layer name before deletion\n   - Provide undo functionality (optional but recommended)\n   - Handle edge cases (removing last layer, removing currently selected layer)\n   - Update canvas immediately when layer is removed\n\n4. **Integration:**\n   - Ensure layer removal works properly with existing layer visibility toggles\n   - Test interaction with layer reordering functionality\n   - Verify that removed layers don't leave artifacts in the rendered output\n\n5. **Accessibility:**\n   - Ensure delete buttons are keyboard accessible\n   - Provide appropriate ARIA labels and screen reader support\n   - Follow proper focus management after layer deletion",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 4
+          }
+        ]
       },
       {
         "id": 5,
