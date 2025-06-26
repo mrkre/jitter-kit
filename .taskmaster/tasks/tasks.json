@@ -57,7 +57,7 @@
         "testStrategy": "",
         "status": "done",
         "dependencies": [
-          "8"
+          8
         ],
         "priority": "medium",
         "subtasks": [
@@ -91,136 +91,6 @@
             "details": "Implement interfaces or APIs for parameter updates and ensure the jitter engine responds correctly to changes.\n<info added on 2025-06-22T16:05:59.531Z>\nImplement parameter control integration with Zustand state management. Create a store that maintains all jitter parameters and their current values. Develop subscription mechanisms for the canvas component to reactively respond to parameter changes. Ensure the API supports:\n\n1. Parameter registration with metadata (min/max values, step sizes, default values)\n2. Batch parameter updates for performance optimization\n3. History tracking for undo/redo functionality\n4. Parameter presets for saving and loading configurations\n\nTest the reactivity chain from UI controls through the state store to the rendering engine, verifying that parameter changes result in immediate visual updates without performance degradation.\n</info added on 2025-06-22T16:05:59.531Z>",
             "status": "done",
             "testStrategy": "Test parameter changes during runtime and verify corresponding updates in jittered outputs."
-          },
-          {
-            "id": 4,
-            "title": "Optimize Performance and Resource Usage",
-            "description": "Profile and optimize the jitter engine for computational efficiency and minimal resource consumption, especially for high-density or high-speed scenarios.",
-            "dependencies": [
-              3
-            ],
-            "details": "Identify bottlenecks and refactor code for improved performance without sacrificing output quality.\n<info added on 2025-06-22T16:06:10.943Z>\nPerformance optimization strategies:\n1. Use React.memo selectively on components to prevent unnecessary re-renders when props haven't changed\n2. Implement offscreen canvas buffering for static or infrequently changing visual layers\n3. Profile render cycles to identify and eliminate redundant calculations\n4. Consider implementing a throttling mechanism for high-frequency parameter changes\n5. Separate UI thread from processing thread where possible to maintain responsiveness\n\nThese optimizations should be implemented while maintaining the quality standards for jitter outputs as specified in the PRD.\n</info added on 2025-06-22T16:06:10.943Z>",
-            "status": "pending",
-            "testStrategy": "Benchmark engine performance under various loads and validate output consistency."
-          },
-          {
-            "id": 6,
-            "title": "Implement Layer Compositing & Clipping Logic",
-            "description": "This subtask will cover the logic for processing multiple layers, including their visibility and clipping properties, as defined in the PRD.",
-            "details": "The engine's main loop should iterate through the `layers` array provided in the `Project` state. For each layer, it should generate the pattern based on its parameters and then render it to the canvas. This subtask includes handling the `isClipped` property, where a layer acts as a mask for the one below it.\n<info added on 2025-06-22T16:08:18.468Z>\nThe Jitter Engine should implement a command-based architecture to maintain separation of concerns. Instead of directly rendering to the canvas, the engine will:\n\n1. Process the layer stack, evaluating visibility and clipping masks\n2. Generate a structured list of primitive drawing commands (e.g., `{ type: 'rect', x: 10, y: 10, width: 5, height: 5, color: '#ff0000' }`)\n3. Return this command list as its output\n\nThis approach decouples the engine's generative logic from the rendering implementation. The `P5Sketch` component will be responsible for:\n- Consuming the command list produced by the engine\n- Translating these abstract commands into p5.js-specific drawing function calls\n- Executing the rendering in its `draw` loop\n\nThis separation allows the engine to remain agnostic to the rendering library, making it more maintainable and potentially compatible with different rendering backends in the future.\n</info added on 2025-06-22T16:08:18.468Z>",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 5,
-            "title": "Validate and Visualize Jittered Outputs",
-            "description": "Develop tools or scripts to visualize jittered points and shapes, and validate the engine's outputs against design requirements.",
-            "dependencies": [
-              4
-            ],
-            "details": "Create visualizations (e.g., plots, diagrams) and perform qualitative and quantitative assessments of jitter patterns.\n<info added on 2025-06-22T16:06:25.301Z>\nImplement real-time visual feedback mechanisms to ensure canvas updates instantly when parameters are manipulated. Validate that visualizations correctly reflect the current state in the data store without perceptible delay. Structure the generated output to maintain clean organization and proper formatting for SVG export compatibility. Test the responsiveness of the visualization system under various parameter change scenarios and data loads to ensure consistent performance.\n</info added on 2025-06-22T16:06:25.301Z>",
-            "status": "pending",
-            "testStrategy": "Conduct visual inspections and automated tests to ensure outputs meet expected jitter characteristics."
-          },
-          {
-            "id": 7,
-            "title": "Implement Color Palette Application Logic",
-            "description": "This subtask will ensure the engine applies the `colorPalette` from a layer's parameters to the visual elements it generates.",
-            "details": "The rendering part of the engine for each layer should access the `colorPalette` array from its parameters. Implement logic to cycle through, randomly select, or map colors from the palette to the individual points or shapes being drawn. This should be flexible enough to support different coloring strategies in the future.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 8,
-            "title": "Refactor P5Sketch Component to Use Named Export",
-            "description": "Refactor the P5Sketch.tsx component to use a named export instead of a default export to comply with project coding standards, and update all imports accordingly.",
-            "details": "This task involves modifying the export pattern in the P5Sketch component to align with project coding standards as defined in CLAUDE.md:\n\n1. Locate the `components/P5Sketch.tsx` file\n2. Change the current implementation from:\n   ```tsx\n   export default function P5Sketch() {\n     // existing implementation\n   }\n   ```\n   \n   To a named export:\n   ```tsx\n   export function P5Sketch() {\n     // existing implementation\n   }\n   ```\n\n3. Search the entire codebase for imports of this component:\n   - Look for patterns like: `import P5Sketch from './components/P5Sketch'` or similar paths\n   - Update all import statements to use named imports: `import { P5Sketch } from './components/P5Sketch'`\n\n4. Special considerations:\n   - Check for any dynamic imports or lazy-loaded components that might reference this component\n   - Ensure that any test files importing this component are also updated\n   - Verify that any component composition patterns (Higher Order Components, render props) using P5Sketch are updated\n\n5. Update any documentation or comments that might reference the import pattern for this component\n\nThis refactoring is part of standardizing the codebase to use consistent export patterns, which improves code readability and maintainability.",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 9,
-            "title": "Refactor Canvas Re-mounting Logic in P5Sketch Component",
-            "description": "Review and refactor the canvas re-mounting logic in components/P5Sketch.tsx at lines 44-58 to improve stability and reduce unnecessary re-renders, addressing potential instability issues.",
-            "details": "This task involves analyzing and refactoring the canvas re-mounting logic in the P5Sketch component to improve stability and performance:\n\n1. Analyze the current implementation at lines 44-58 in `components/P5Sketch.tsx`:\n   - Identify the causes of unnecessary re-mounts\n   - Determine which dependencies in useEffect hooks might be triggering excessive re-renders\n   - Evaluate the current approach to canvas lifecycle management\n\n2. Implement improvements:\n   - Refactor the useEffect dependency array to only include necessary dependencies\n   - Consider implementing useMemo or useCallback for functions or objects used in the dependency array\n   - Ensure proper cleanup in useEffect return functions to prevent memory leaks\n   - Potentially implement React.memo to prevent unnecessary re-renders of the component\n\n3. Specific code changes:\n   - Review the current p5.js instance creation and destruction logic\n   - Ensure canvas mounting/unmounting only occurs when genuinely needed\n   - Consider implementing a more robust state management approach for the p5 instance\n   - Add appropriate comments explaining the re-mounting conditions and logic\n\n4. Performance considerations:\n   - Measure and document the frequency of re-mounts before and after changes\n   - Ensure the refactored code maintains all existing functionality\n   - Consider browser-specific optimizations if necessary\n\n5. Documentation:\n   - Update any relevant comments in the code to explain the new approach\n   - Document any edge cases or considerations for future developers",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 10,
-            "title": "Add Type Safety for p5 Parameter in Engine Module",
-            "description": "Replace the `any` type for the `p5` parameter in `lib/engine/index.ts` at line 43 with a proper type definition to improve type safety and code quality.",
-            "details": "This task involves improving type safety in the jitter engine core by properly typing the p5 instance:\n\n1. Analyze the current implementation in `lib/engine/index.ts` at line 43 where the `p5` parameter is typed as `any`.\n\n2. Import the appropriate type from the p5.js library:\n   ```typescript\n   import p5 from 'p5';\n   // OR for more specific typing\n   import type P5 from 'p5';\n   ```\n\n3. Replace the `any` type with the proper p5 type:\n   ```typescript\n   // From:\n   function someFunction(p5: any, ...otherParams) {\n     // implementation\n   }\n   \n   // To:\n   function someFunction(p5: P5, ...otherParams) {\n     // implementation\n   }\n   ```\n\n4. If the function is using specific p5 features, consider using a more specific type or interface that extends the base p5 type.\n\n5. Ensure that all usages of the p5 parameter within the function body are compatible with the new type.\n\n6. Update any related function signatures or interfaces that might be affected by this type change.\n\n7. Verify that TypeScript compilation succeeds without errors after the changes.\n\n8. Add appropriate JSDoc comments to document the parameter's expected type and usage.",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 11,
-            "title": "Refactor Duplicate Layer Interface in JitterContext Component",
-            "description": "Remove the duplicate `Layer` interface definition in `components/JitterContext.tsx` (lines 11-16) and import it from `lib/types.ts` to resolve the conflict and improve code consistency.",
-            "details": "This task involves refactoring the duplicate type definition in the JitterContext component to improve code maintainability and consistency:\n\n1. Locate the duplicate `Layer` interface in `components/JitterContext.tsx` at lines 11-16:\n   ```typescript\n   interface Layer {\n     id: string;\n     name: string;\n     visible: boolean;\n     // other properties\n   }\n   ```\n\n2. Remove this duplicate interface definition from the file.\n\n3. Add an import statement at the top of the file to import the `Layer` interface from the central types file:\n   ```typescript\n   import { Layer } from '../lib/types';\n   ```\n\n4. Verify that all references to the `Layer` interface in `JitterContext.tsx` continue to work correctly after this change.\n\n5. Check if any properties or methods in the local interface definition differ from the one in `lib/types.ts`:\n   - If there are differences, either update the central definition in `lib/types.ts` to include all necessary properties\n   - Or create a more specific interface that extends the base `Layer` interface if needed\n\n6. Ensure proper relative path in the import statement based on the file structure.\n\n7. Run TypeScript type checking to confirm no type errors are introduced by this change.",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 12,
-            "title": "Implement Error Boundaries for P5.js Component",
-            "description": "Implement React error boundaries around the P5.js component to gracefully handle rendering failures and prevent the entire application from crashing when canvas rendering issues occur.",
-            "details": "This task involves implementing React error boundaries to isolate failures in the P5.js rendering component:\n\n1. Create a new `ErrorBoundary.tsx` component that extends React.Component with error handling capabilities:\n   ```tsx\n   import React, { Component, ErrorInfo, ReactNode } from 'react';\n\n   interface Props {\n     children: ReactNode;\n     fallback?: ReactNode;\n   }\n\n   interface State {\n     hasError: boolean;\n     error: Error | null;\n   }\n\n   export class ErrorBoundary extends Component<Props, State> {\n     constructor(props: Props) {\n       super(props);\n       this.state = { hasError: false, error: null };\n     }\n\n     static getDerivedStateFromError(error: Error): State {\n       return { hasError: true, error };\n     }\n\n     componentDidCatch(error: Error, errorInfo: ErrorInfo): void {\n       console.error('P5.js component error:', error, errorInfo);\n       // Optional: send error to logging service\n     }\n\n     render(): ReactNode {\n       if (this.state.hasError) {\n         return this.props.fallback || (\n           <div className=\"error-container\">\n             <h3>Rendering Error</h3>\n             <p>There was a problem rendering the visualization.</p>\n             <button onClick={() => this.setState({ hasError: false, error: null })}>\n               Try Again\n             </button>\n           </div>\n         );\n       }\n\n       return this.props.children;\n     }\n   }\n   ```\n\n2. Wrap the P5Sketch component with the ErrorBoundary in its parent component:\n   ```tsx\n   import { P5Sketch } from './components/P5Sketch';\n   import { ErrorBoundary } from './components/ErrorBoundary';\n\n   function CanvasContainer() {\n     return (\n       <ErrorBoundary>\n         <P5Sketch />\n       </ErrorBoundary>\n     );\n   }\n   ```\n\n3. Add specific error handling within the P5Sketch component to catch and handle p5.js-specific errors:\n   ```tsx\n   export function P5Sketch() {\n     const setup = (p5: P5Instance, canvasParentRef: Element) => {\n       try {\n         // Existing setup code\n       } catch (error) {\n         console.error('Error in p5.js setup:', error);\n         // Handle specific setup errors if possible\n       }\n     };\n\n     const draw = (p5: P5Instance) => {\n       try {\n         // Existing draw code\n       } catch (error) {\n         console.error('Error in p5.js draw loop:', error);\n         p5.noLoop(); // Stop the animation loop on error\n         throw error; // Let the error boundary handle it\n       }\n     };\n\n     // Rest of component\n   }\n   ```\n\n4. Add error handling for any asynchronous operations within the P5Sketch component.\n\n5. Consider implementing a mechanism to restart the sketch after an error occurs, possibly with a reduced feature set or simpler rendering approach.",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 13,
-            "title": "Optimize Grid Generation Algorithm in Basic Algorithms Module",
-            "description": "Refactor the grid generation algorithm in `lib/engine/basicAlgorithms.ts` to improve performance for high-density values (up to 50), replacing the current inefficient nested loops implementation.",
-            "details": "This task involves optimizing the grid generation algorithm to improve performance for high-density values:\n\n1. Analyze the current implementation in `lib/engine/basicAlgorithms.ts`:\n   - Identify the nested loops that are causing performance issues\n   - Profile the current implementation to establish a performance baseline\n   - Determine which operations are most expensive\n\n2. Research and implement optimization strategies:\n   - Consider using spatial partitioning techniques instead of nested loops\n   - Evaluate whether a matrix-based approach would be more efficient\n   - Consider using Web Workers for computation if appropriate\n   - Implement memoization for repeated calculations\n   - Explore the possibility of using typed arrays for better memory management\n\n3. Implementation steps:\n   ```typescript\n   // Example optimization approach (pseudocode)\n   function generateGrid(density: number, width: number, height: number): Point[] {\n     // Pre-calculate grid dimensions based on density\n     const cellSize = Math.max(width, height) / density;\n     const cols = Math.ceil(width / cellSize);\n     const rows = Math.ceil(height / cellSize);\n     \n     // Use a more efficient data structure\n     const points: Point[] = new Array(cols * rows);\n     \n     // Single loop implementation with index calculation\n     for (let i = 0; i < cols * rows; i++) {\n       const col = i % cols;\n       const row = Math.floor(i / cols);\n       \n       points[i] = {\n         x: col * cellSize + (Math.random() * cellSize * jitterFactor),\n         y: row * cellSize + (Math.random() * cellSize * jitterFactor)\n       };\n     }\n     \n     return points;\n   }\n   ```\n\n4. Add performance monitoring:\n   - Implement timing measurements to compare before/after performance\n   - Add conditional debug logging that can be enabled for performance testing\n\n5. Update documentation:\n   - Add comments explaining the optimization approach\n   - Update any relevant documentation about performance characteristics\n   - Document the maximum supported density and expected performance",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 14,
-            "title": "Implement Memoization for Perlin Noise Calculations",
-            "description": "Optimize Perlin noise calculations in `lib/engine/advancedAlgorithms.ts` (lines 29-35) by implementing memoization to avoid redundant computations in tight loops.",
-            "details": "This task involves implementing memoization to optimize Perlin noise calculations:\n\n1. Analyze the current implementation in `lib/engine/advancedAlgorithms.ts` (lines 29-35):\n   - Identify the specific Perlin noise functions that are being called repeatedly\n   - Profile the current implementation to establish a performance baseline\n   - Determine which parameter combinations are most frequently reused\n\n2. Design a memoization strategy:\n   - Create a cache data structure (Map or object) to store previously computed values\n   - Define an appropriate key generation function that uniquely identifies input parameters\n   - Implement cache size limits to prevent memory issues during long-running animations\n\n3. Implement the memoized version of the Perlin noise function:\n   ```typescript\n   // Example implementation\n   const noiseCache = new Map<string, number>();\n   const MAX_CACHE_SIZE = 10000; // Adjust based on profiling\n\n   function memoizedNoise(x: number, y: number, z: number = 0): number {\n     // Create a unique key for these parameters\n     const key = `${x.toFixed(4)}_${y.toFixed(4)}_${z.toFixed(4)}`;\n     \n     // Check if result is already cached\n     if (noiseCache.has(key)) {\n       return noiseCache.get(key)!;\n     }\n     \n     // Compute the value\n     const result = originalNoiseFunction(x, y, z);\n     \n     // Manage cache size\n     if (noiseCache.size >= MAX_CACHE_SIZE) {\n       // Remove oldest entries (first 20% of cache)\n       const keysToRemove = Array.from(noiseCache.keys())\n         .slice(0, Math.floor(MAX_CACHE_SIZE * 0.2));\n       keysToRemove.forEach(k => noiseCache.delete(k));\n     }\n     \n     // Cache the result\n     noiseCache.set(key, result);\n     return result;\n   }\n   ```\n\n4. Replace the original Perlin noise function calls with the memoized version:\n   - Update the implementation in lines 29-35 to use the new memoized function\n   - Ensure the function signature remains compatible with existing code\n\n5. Add cache statistics for debugging (optional):\n   - Track cache hits/misses\n   - Log cache efficiency metrics during development\n\n6. Consider adding a cache reset function that can be called when parameters change significantly to avoid using stale cached values.",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 15,
-            "title": "Thread-Safe Refactoring of Global Perlin Noise Instance",
-            "description": "Refactor the global Perlin noise instance in `lib/engine/algorithmUtils.ts` (line 109) to ensure it is thread-safe and prevent potential race conditions during concurrent operations.",
-            "details": "This task involves refactoring the global Perlin noise instance to ensure thread safety and prevent race conditions:\n\n1. Analyze the current implementation in `lib/engine/algorithmUtils.ts` (line 109):\n   - Identify how the global Perlin noise instance is currently defined and used\n   - Determine potential race conditions that could occur during concurrent operations\n   - Assess the impact of the current implementation on multi-threaded environments\n\n2. Implement a thread-safe solution using one of these approaches:\n   - **Option A: Factory Pattern**\n     ```typescript\n     // Replace global instance:\n     // const perlinNoise = new PerlinNoise(); // Current implementation\n     \n     // With a factory function that returns isolated instances:\n     function getPerlinNoiseInstance() {\n       return new PerlinNoise();\n     }\n     ```\n   \n   - **Option B: Thread-Local Storage**\n     ```typescript\n     // If using Web Workers, implement a mechanism to create isolated instances per worker\n     class PerlinNoiseManager {\n       private static instances = new Map<string, PerlinNoise>();\n       \n       static getInstance(workerId: string): PerlinNoise {\n         if (!this.instances.has(workerId)) {\n           this.instances.set(workerId, new PerlinNoise());\n         }\n         return this.instances.get(workerId)!;\n       }\n     }\n     ```\n   \n   - **Option C: Immutable Implementation**\n     ```typescript\n     // Refactor PerlinNoise class to be stateless/immutable\n     class PerlinNoise {\n       constructor(private seed?: number) {\n         // Initialize with optional seed\n       }\n       \n       // Ensure all methods are pure functions that don't modify internal state\n       noise(x: number, y: number, z: number = 0): number {\n         // Implementation that doesn't rely on mutable state\n         // ...\n       }\n     }\n     ```\n\n3. Update all references to the global Perlin noise instance throughout the codebase:\n   - Search for all usages of the Perlin noise instance\n   - Modify each usage to align with the new thread-safe implementation\n   - Ensure backward compatibility or provide clear migration path\n\n4. Add documentation comments explaining the thread-safety considerations:\n   ```typescript\n   /**\n    * Thread-safe implementation of Perlin noise generator.\n    * Each call returns an isolated instance to prevent race conditions\n    * when used in concurrent environments.\n    */\n   ```\n\n5. Consider performance implications:\n   - Benchmark the new implementation against the original\n   - Optimize if necessary to minimize any performance overhead\n   - Document any performance trade-offs made for thread safety",
-          "status": "done",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 16,
-            "title": "Implement Canvas Performance Optimizations",
-            "description": "Implement performance optimization techniques such as off-screen rendering and layer caching to improve canvas rendering performance, especially for complex or animated jitter patterns.",
-            "details": "This task involves implementing several canvas performance optimization techniques:\n\n1. Off-screen rendering:\n   - Create a secondary, off-screen canvas for rendering complex elements\n   - Implement a buffer system where patterns are rendered to an off-screen canvas first\n   - Only copy the completed render to the visible canvas when ready\n   - Example implementation:\n   ```typescript\n   // Create off-screen buffer\n   const offscreenCanvas = document.createElement('canvas');\n   offscreenCanvas.width = mainCanvas.width;\n   offscreenCanvas.height = mainCanvas.height;\n   const offscreenCtx = offscreenCanvas.getContext('2d');\n   \n   // Render to off-screen buffer\n   function renderToBuffer() {\n     // Perform complex rendering operations on offscreenCtx\n     // ...\n     \n     // Copy to main visible canvas only when complete\n     mainCtx.drawImage(offscreenCanvas, 0, 0);\n   }\n   ```\n\n2. Layer caching:\n   - Identify static or slowly changing elements in the jitter patterns\n   - Implement a caching system to store rendered layers that don't need frequent updates\n   - Only re-render layers when their parameters change\n   - Use a multi-layer approach where appropriate:\n     - Background layer (rarely changes)\n     - Mid-ground layer (changes occasionally)\n     - Foreground layer (changes frequently)\n\n3. Optimize the animation loop:\n   - Implement frame skipping for high-complexity patterns\n   - Add dynamic quality adjustment based on FPS monitoring\n   - Consider implementing a request-cancel pattern for the animation frame:\n   ```typescript\n   let animationFrameId: number;\n   \n   function startAnimation() {\n     cancelAnimationFrame(animationFrameId); // Cancel any existing request\n     animationFrameId = requestAnimationFrame(animate);\n   }\n   \n   function stopAnimation() {\n     cancelAnimationFrame(animationFrameId);\n   }\n   ```\n\n4. Implement canvas size optimization:\n   - Scale canvas based on device pixel ratio for crisp rendering\n   - Consider downscaling during rapid animations, then restoring quality when static\n   - Example implementation:\n   ```typescript\n   function optimizeCanvasForDevice() {\n     const dpr = window.devicePixelRatio || 1;\n     const rect = canvas.getBoundingClientRect();\n     \n     canvas.width = rect.width * dpr;\n     canvas.height = rect.height * dpr;\n     canvas.style.width = `${rect.width}px`;\n     canvas.style.height = `${rect.height}px`;\n     \n     ctx.scale(dpr, dpr);\n   }\n   ```\n\n5. Implement object pooling for frequently created/destroyed objects:\n   - Create a pool of reusable objects for pattern elements\n   - Recycle objects instead of creating new ones to reduce garbage collection\n   - Example implementation:\n   ```typescript\n   class ParticlePool {\n     private pool: Particle[] = [];\n     private activeParticles: Particle[] = [];\n     \n     constructor(size: number) {\n       // Pre-allocate particles\n       for (let i = 0; i < size; i++) {\n         this.pool.push(new Particle());\n       }\n     }\n     \n     getParticle(): Particle {\n       let particle = this.pool.pop();\n       if (!particle) {\n         particle = new Particle();\n       }\n       this.activeParticles.push(particle);\n       return particle;\n     }\n     \n     recycleParticle(particle: Particle) {\n       const index = this.activeParticles.indexOf(particle);\n       if (index > -1) {\n         this.activeParticles.splice(index, 1);\n         particle.reset();\n         this.pool.push(particle);\n       }\n     }\n   }\n   ```\n\n6. Integration with existing components:\n   - Modify the P5Sketch component to incorporate these optimization techniques\n   - Update the animation loop in Task #5 to leverage the new optimizations\n   - Ensure the optimizations work with the pattern extensibility from Task #6",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 2
-          },
-          {
-            "id": 17,
-            "title": "Implement Debouncing for Parameter Updates",
-            "description": "Implement debouncing mechanism for real-time parameter updates to prevent excessive canvas re-renders and improve performance when users adjust controls.",
-            "details": "This task involves implementing a debounce mechanism to optimize performance when parameters are updated:\n\n1. Identify all parameter update events:\n   - Locate all event handlers in the UnifiedControlPanel that trigger re-renders\n   - Focus on slider inputs, number inputs, and other controls that can change rapidly\n\n2. Create a debounce utility function:\n   ```typescript\n   // utils/debounce.ts\n   export function debounce<T extends (...args: any[]) => any>(\n     func: T,\n     wait: number\n   ): (...args: Parameters<T>) => void {\n     let timeout: ReturnType<typeof setTimeout> | null = null;\n     \n     return function(...args: Parameters<T>): void {\n       const later = () => {\n         timeout = null;\n         func(...args);\n       };\n       \n       if (timeout !== null) {\n         clearTimeout(timeout);\n       }\n       timeout = setTimeout(later, wait);\n     };\n   }\n   ```\n\n3. Apply debouncing to parameter update handlers:\n   ```typescript\n   // Before\n   const handleDensityChange = (value: number) => {\n     setDensity(value);\n     updateCanvas(); // Triggers re-render immediately\n   };\n   \n   // After\n   const handleDensityChange = useCallback((value: number) => {\n     setDensity(value);\n   }, []);\n   \n   const debouncedUpdateCanvas = useCallback(\n     debounce(() => {\n       updateCanvas();\n     }, 150), // 150ms delay\n     [updateCanvas]\n   );\n   \n   // Use effect to trigger the debounced update\n   useEffect(() => {\n     debouncedUpdateCanvas();\n   }, [density, debouncedUpdateCanvas]);\n   ```\n\n4. Implement visual feedback during debounce period:\n   - Add subtle visual indicators to show that changes are pending\n   - Consider using a small \"updating\" indicator that appears during the debounce period\n\n5. Make the debounce delay configurable:\n   - Add a configuration option for debounce delay (default: 150ms)\n   - Consider different delays for different parameter types (e.g., shorter for critical parameters)\n\n6. Special handling for certain parameters:\n   - Identify any parameters that should update immediately without debouncing\n   - Create a mechanism to bypass debouncing for these special cases\n\n7. Performance monitoring:\n   - Add performance tracking to measure the impact of debouncing\n   - Log render frequency before and after implementation",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 2
           }
         ]
       },
@@ -233,7 +103,7 @@
         "status": "pending",
         "dependencies": [
           2,
-          "8"
+          8
         ],
         "priority": "medium",
         "subtasks": []
@@ -454,12 +324,98 @@
             "parentTaskId": 9
           }
         ]
+      },
+      {
+        "id": 10,
+        "title": "Optimize Performance and Resource Usage",
+        "description": "Profile and optimize the jitter engine for computational efficiency and minimal resource consumption, especially for high-density or high-speed scenarios.",
+        "details": "Performance optimization strategies:\n1. Use React.memo selectively on components to prevent unnecessary re-renders when props haven't changed\n2. Implement offscreen canvas buffering for static or infrequently changing visual layers\n3. Profile render cycles to identify and eliminate redundant calculations\n4. Consider implementing a throttling mechanism for high-frequency parameter changes\n5. Separate UI thread from processing thread where possible to maintain responsiveness\n\nThese optimizations should be implemented while maintaining the quality standards for jitter outputs as specified in the PRD.",
+        "testStrategy": "Benchmark engine performance under various loads and validate output consistency.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Layer Compositing & Clipping Logic",
+        "description": "Implement the logic for processing multiple layers, including their visibility and clipping properties, as defined in the PRD.",
+        "details": "The engine's main loop should iterate through the `layers` array provided in the `Project` state. For each layer, it should generate the pattern based on its parameters and then render it to the canvas. This subtask includes handling the `isClipped` property, where a layer acts as a mask for the one below it.\n\nThe Jitter Engine should implement a command-based architecture to maintain separation of concerns. Instead of directly rendering to the canvas, the engine will:\n\n1. Process the layer stack, evaluating visibility and clipping masks\n2. Generate a structured list of primitive drawing commands (e.g., `{ type: 'rect', x: 10, y: 10, width: 5, height: 5, color: '#ff0000' }`)\n3. Return this command list as its output\n\nThis approach decouples the engine's generative logic from the rendering implementation. The `P5Sketch` component will be responsible for:\n- Consuming the command list produced by the engine\n- Translating these abstract commands into p5.js-specific drawing function calls\n- Executing the rendering in its `draw` loop\n\nThis separation allows the engine to remain agnostic to the rendering library, making it more maintainable and potentially compatible with different rendering backends in the future.",
+        "testStrategy": "Test layer visibility, clipping masks, and command generation with various layer configurations.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          3
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Validate and Visualize Jittered Outputs",
+        "description": "Develop tools or scripts to visualize jittered points and shapes, and validate the engine's outputs against design requirements.",
+        "details": "Implement real-time visual feedback mechanisms to ensure canvas updates instantly when parameters are manipulated. Validate that visualizations correctly reflect the current state in the data store without perceptible delay. Structure the generated output to maintain clean organization and proper formatting for SVG export compatibility. Test the responsiveness of the visualization system under various parameter change scenarios and data loads to ensure consistent performance.",
+        "testStrategy": "Conduct visual inspections and automated tests to ensure outputs meet expected jitter characteristics.",
+        "status": "pending",
+        "dependencies": [
+          10,
+          11
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Implement Color Palette Application Logic",
+        "description": "Ensure the engine applies the `colorPalette` from a layer's parameters to the visual elements it generates.",
+        "details": "The rendering part of the engine for each layer should access the `colorPalette` array from its parameters. Implement logic to cycle through, randomly select, or map colors from the palette to the individual points or shapes being drawn. This should be flexible enough to support different coloring strategies in the future.",
+        "testStrategy": "Test color palette application with various strategies (cycle, random, mapped) and verify correct color assignment.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          11
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Implement Canvas Performance Optimizations",
+        "description": "Implement performance optimization techniques such as off-screen rendering and layer caching to improve canvas rendering performance, especially for complex or animated jitter patterns.",
+        "details": "This task involves implementing several canvas performance optimization techniques:\n\n1. Off-screen rendering:\n   - Create a secondary, off-screen canvas for rendering complex elements\n   - Implement a buffer system where patterns are rendered to an off-screen canvas first\n   - Only copy the completed render to the visible canvas when ready\n\n2. Layer caching:\n   - Identify static or slowly changing elements in the jitter patterns\n   - Implement a caching system to store rendered layers that don't need frequent updates\n   - Only re-render layers when their parameters change\n   - Use a multi-layer approach where appropriate\n\n3. Optimize the animation loop:\n   - Implement frame skipping for high-complexity patterns\n   - Add dynamic quality adjustment based on FPS monitoring\n   - Consider implementing a request-cancel pattern for the animation frame\n\n4. Implement canvas size optimization:\n   - Scale canvas based on device pixel ratio for crisp rendering\n   - Consider downscaling during rapid animations, then restoring quality when static\n\n5. Implement object pooling for frequently created/destroyed objects:\n   - Create a pool of reusable objects for pattern elements\n   - Recycle objects instead of creating new ones to reduce garbage collection\n\n6. Integration with existing components:\n   - Modify the P5Sketch component to incorporate these optimization techniques\n   - Update the animation loop in Task #5 to leverage the new optimizations\n   - Ensure the optimizations work with the pattern extensibility from Task #6",
+        "testStrategy": "Benchmark canvas performance before and after optimizations, measure FPS under various load conditions, and validate memory usage patterns.",
+        "status": "pending",
+        "dependencies": [
+          3,
+          5,
+          11
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Implement Debouncing for Parameter Updates",
+        "description": "Implement debouncing mechanism for real-time parameter updates to prevent excessive canvas re-renders and improve performance when users adjust controls.",
+        "details": "This task involves implementing a debounce mechanism to optimize performance when parameters are updated:\n\n1. Identify all parameter update events:\n   - Locate all event handlers in the UnifiedControlPanel that trigger re-renders\n   - Focus on slider inputs, number inputs, and other controls that can change rapidly\n\n2. Create a debounce utility function\n\n3. Apply debouncing to parameter update handlers\n\n4. Implement visual feedback during debounce period:\n   - Add subtle visual indicators to show that changes are pending\n   - Consider using a small \"updating\" indicator that appears during the debounce period\n\n5. Make the debounce delay configurable:\n   - Add a configuration option for debounce delay (default: 150ms)\n   - Consider different delays for different parameter types (e.g., shorter for critical parameters)\n\n6. Special handling for certain parameters:\n   - Identify any parameters that should update immediately without debouncing\n   - Create a mechanism to bypass debouncing for these special cases\n\n7. Performance monitoring:\n   - Add performance tracking to measure the impact of debouncing\n   - Log render frequency before and after implementation",
+        "testStrategy": "Measure render frequency before and after debouncing implementation, test user experience with rapid parameter changes, and validate that critical parameters still update immediately when needed.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          10
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-22T02:01:33.891Z",
-      "updated": "2025-06-22T16:23:26.867Z",
-      "description": "Tag created on 6/22/2025"
+      "updated": "2025-06-26T00:00:00.000Z",
+      "description": "Reorganized task structure - moved large subtasks to main tasks and updated dependencies"
     }
   }
 }
