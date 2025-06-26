@@ -426,7 +426,9 @@ export function comparePerformance(
   // Run multiple iterations for better accuracy
   const iterations = 10
 
+  // eslint-disable-next-line no-console
   console.group('Performance Comparison')
+  // eslint-disable-next-line no-console
   console.log(
     `Running ${iterations} iterations with density: ${layer.parameters.density}`
   )
@@ -450,10 +452,15 @@ export function comparePerformance(
   const optimizedAvg = optimizedTotal / iterations
   const improvement = ((originalAvg - optimizedAvg) / originalAvg) * 100
 
+  // eslint-disable-next-line no-console
   console.log(`Original average: ${originalAvg.toFixed(2)}ms`)
+  // eslint-disable-next-line no-console
   console.log(`Optimized average: ${optimizedAvg.toFixed(2)}ms`)
+  // eslint-disable-next-line no-console
   console.log(`Performance improvement: ${improvement.toFixed(1)}%`)
+  // eslint-disable-next-line no-console
   console.log(`Speed multiplier: ${(originalAvg / optimizedAvg).toFixed(2)}x`)
+  // eslint-disable-next-line no-console
   console.groupEnd()
 
   enablePerformanceMonitoring(false)

@@ -25,6 +25,15 @@ interface AlgorithmParams {
   // Recursive specific
   subdivisions?: number
   threshold?: number
+  numColumns?: number
+  numRows?: number
+  solidBarCount?: number
+  solidBarCountX?: number
+  solidBarCountY?: number
+  subdivisionMode?: 'linear' | 'exponential'
+  orientation?: 'vertical' | 'horizontal' | 'both'
+  cellPadding?: number
+  backgroundColor?: string
   // Isometric specific
   perspective?: number
   // Perlin specific
@@ -117,6 +126,15 @@ export function JitterProvider({ children }: JitterProviderProps) {
     axiom: 'F',
     rules: 'F=F+F-F-F+F',
     angle: 25,
+    // Grid/bar pattern specific defaults (safer for exponential mode)
+    numColumns: 15,
+    numRows: 15,
+    solidBarCountX: 0,
+    solidBarCountY: 0,
+    subdivisionMode: 'linear',
+    orientation: 'vertical',
+    cellPadding: 0,
+    backgroundColor: 'white',
   })
 
   const [layers, setLayers] = useState<Layer[]>([])
@@ -164,6 +182,15 @@ export function JitterProvider({ children }: JitterProviderProps) {
         axiom: params.axiom,
         rules: params.rules,
         angle: params.angle,
+        // Grid/bar pattern specific
+        numColumns: params.numColumns,
+        numRows: params.numRows,
+        solidBarCountX: params.solidBarCountX,
+        solidBarCountY: params.solidBarCountY,
+        subdivisionMode: params.subdivisionMode,
+        orientation: params.orientation,
+        cellPadding: params.cellPadding,
+        backgroundColor: params.backgroundColor,
       },
       animation: {
         type: params.animationType as Layer['animation']['type'],

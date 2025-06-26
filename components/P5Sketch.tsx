@@ -171,7 +171,7 @@ export const P5Sketch = memo(function P5Sketch({
             subdivisions: localParams.subdivisions || 3,
             threshold: localParams.threshold || 0.5,
             perspective: localParams.perspective || 0.5,
-            shapeVariety: localParams.shapeVariety || 1,
+            shape: localParams.shape || 'cubes',
             heightVariation: localParams.heightVariation || 2,
             sizeVariation: localParams.sizeVariation || 3,
             displacementIntensity: localParams.displacementIntensity || 1,
@@ -180,9 +180,13 @@ export const P5Sketch = memo(function P5Sketch({
             octaves: localParams.octaves || 4,
             fieldStrength: localParams.fieldStrength || 1,
             flowSpeed: localParams.flowSpeed || 0.01,
-            branchLength: localParams.branchLength || 0.7,
-            treeCount: localParams.treeCount || 8,
+            branchLength: localParams.branchLength || 0.8,
+            treeCount: localParams.treeCount || 3,
             iterations: localParams.iterations || 6,
+            rootDepth: localParams.rootDepth || 5,
+            windStrength: localParams.windStrength || 0.3,
+            treeSize: localParams.treeSize || 1.0,
+            treeHeight: localParams.treeHeight || 1.0,
             gravity: localParams.gravity || 0.2,
             friction: localParams.friction || 0.95,
             generations: localParams.generations || 10,
@@ -191,6 +195,16 @@ export const P5Sketch = memo(function P5Sketch({
             axiom: localParams.axiom || 'F', // L-Systems axiom
             rules: localParams.rules || 'F=F+F-F-F+F', // L-Systems rules
             turnAngle: localParams.angle || 25, // L-Systems turn angle
+            // Recursive grid/bar pattern parameters (safer defaults)
+            numColumns: localParams.numColumns || 15,
+            numRows: localParams.numRows || 15,
+            solidBarCount: localParams.solidBarCount || 10,
+            solidBarCountX: localParams.solidBarCountX || 0,
+            solidBarCountY: localParams.solidBarCountY || 0,
+            subdivisionMode: localParams.subdivisionMode || 'linear',
+            orientation: localParams.orientation || 'vertical',
+            cellPadding: localParams.cellPadding || 0,
+            backgroundColor: localParams.backgroundColor || 'white',
             // Pass canvas dimensions to algorithms
             canvasWidth,
             canvasHeight,
@@ -326,6 +340,11 @@ export const P5Sketch = memo(function P5Sketch({
                 p.endShape(p.CLOSE)
               }
               break
+            case 'circle':
+              if (cmd.radius) {
+                p.circle(cmd.position.x, cmd.position.y, cmd.radius * 2)
+              }
+              break
             case 'polygon':
               if (cmd.points && cmd.points.length >= 3) {
                 p.beginShape()
@@ -354,14 +373,16 @@ export const P5Sketch = memo(function P5Sketch({
 
       function setColorFromString(colorName: string) {
         const colors: Record<string, [number, number, number]> = {
-          purple: [147, 51, 234],
-          blue: [59, 130, 246],
+          purple: [168, 85, 247], // #a855f7
+          pink: [236, 72, 153], // #ec4899
+          blue: [59, 130, 246], // #3b82f6
+          teal: [20, 184, 166], // #14b8a6
+          red: [239, 68, 68], // #ef4444
+          yellow: [234, 179, 8], // #eab308
+          white: [255, 255, 255], // #ffffff
+          black: [0, 0, 0], // #000000
           green: [34, 197, 94],
-          yellow: [234, 179, 8],
-          red: [239, 68, 68],
-          pink: [236, 72, 153],
           indigo: [99, 102, 241],
-          teal: [20, 184, 166],
         }
 
         // Handle hex colors
@@ -379,14 +400,16 @@ export const P5Sketch = memo(function P5Sketch({
 
       function setStrokeColorFromString(colorName: string) {
         const colors: Record<string, [number, number, number]> = {
-          purple: [147, 51, 234],
-          blue: [59, 130, 246],
+          purple: [168, 85, 247], // #a855f7
+          pink: [236, 72, 153], // #ec4899
+          blue: [59, 130, 246], // #3b82f6
+          teal: [20, 184, 166], // #14b8a6
+          red: [239, 68, 68], // #ef4444
+          yellow: [234, 179, 8], // #eab308
+          white: [255, 255, 255], // #ffffff
+          black: [0, 0, 0], // #000000
           green: [34, 197, 94],
-          yellow: [234, 179, 8],
-          red: [239, 68, 68],
-          pink: [236, 72, 153],
           indigo: [99, 102, 241],
-          teal: [20, 184, 166],
         }
 
         // Handle hex colors
