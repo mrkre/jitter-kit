@@ -20,5 +20,6 @@ export {
   getRandomColor,
   createColorPalette,
   PerlinNoise,
-  perlinNoise,
+  createPerlinNoise,
+  perlinNoise, // @deprecated: Use createPerlinNoise() for thread safety
 } from './algorithmUtils'

@@ -11,6 +11,7 @@ export interface DrawingCommand {
   type:
     | 'rect'
     | 'ellipse'
+    | 'circle'
     | 'line'
     | 'triangle'
     | 'quad'
@@ -40,6 +41,7 @@ export interface Layer {
   name: string
   type: 'grid' | 'mask'
   visible: boolean
+  locked: boolean
   isClipped: boolean
   parameters: {
     algorithm:
@@ -77,6 +79,7 @@ export interface Layer {
     threshold?: number
     // Isometric specific
     perspective?: number
+    shape?: string // Shape type for isometric grids
     // Perlin specific
     fieldStrength?: number
     flowSpeed?: number
@@ -85,6 +88,7 @@ export interface Layer {
     branchAngle?: number // Branching angle in degrees
     iterations?: number // Number of recursive iterations
     treeCount?: number // Number of trees to generate
+    scalingExponent?: number // Scaling exponent (α) for branch thickness
     // Particle specific
     gravity?: number
     friction?: number
@@ -96,6 +100,16 @@ export interface Layer {
     axiom?: string
     rules?: string
     turnAngle?: number
+    // Recursive/grid pattern specific
+    numColumns?: number // Number of columns for grid/bar pattern
+    numRows?: number // Number of rows for grid/bar pattern
+    solidBarCount?: number // Number of solid bars before subdivision
+    subdivisionMode?: 'linear' | 'exponential' // Subdivision mode for grid/bar
+    orientation?: 'vertical' | 'horizontal' | 'both' // Orientation for grid/bar
+    cellPadding?: number // Padding between cells/bars
+    backgroundColor?: string // Background color for grid/bar
+    solidBarCountX?: number
+    solidBarCountY?: number
   }
   animation: {
     type: 'none' | 'pulseScale' | 'cycleColor'

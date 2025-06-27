@@ -1,4 +1,5 @@
 import type { Layer, DrawingCommand } from '@/lib/types'
+import type p5 from 'p5'
 import {
   generateUniformGrid,
   generateNoiseDisplacementGrid,
@@ -40,7 +41,7 @@ export const generateDrawingCommands = (layer: Layer): DrawingCommand[] => {
 
 // Utility function to render drawing commands with P5.js
 export const renderDrawingCommands = (
-  p5: any,
+  p5: p5,
   commands: DrawingCommand[]
 ): void => {
   commands.forEach((command) => {

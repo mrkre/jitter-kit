@@ -6,14 +6,17 @@ import { Maximize2, Minimize2 } from 'lucide-react'
 
 import dynamic from 'next/dynamic'
 
-const P5Sketch = dynamic(() => import('./P5Sketch'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center">
-      <Spinner size="lg" />
-    </div>
-  ),
-})
+const P5Sketch = dynamic(
+  () => import('./P5Sketch').then((mod) => ({ default: mod.P5Sketch })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    ),
+  }
+)
 import { useJitter } from './JitterContext'
 import { Spinner } from './ui'
 

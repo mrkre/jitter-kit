@@ -93,6 +93,23 @@ export function UnifiedControlPanel({
       paramConfig
     const value = params[key as keyof typeof params]
 
+    // Skip parameters based on orientation for recursive algorithm
+    if (params.algorithm === 'recursive') {
+      const orientation = params.orientation || 'vertical'
+      if (key === 'numRows' && orientation === 'vertical') {
+        return null
+      }
+      if (key === 'numColumns' && orientation === 'horizontal') {
+        return null
+      }
+      if (key === 'solidBarCountX' && orientation === 'horizontal') {
+        return null
+      }
+      if (key === 'solidBarCountY' && orientation === 'vertical') {
+        return null
+      }
+    }
+
     switch (type) {
       case 'slider':
         return (
@@ -133,6 +150,30 @@ export function UnifiedControlPanel({
               onChange={(e) => updateParams({ [key]: e.target.value })}
               className="w-full rounded-md border border-gray-200/80 bg-white/80 px-3 py-2 text-sm transition-colors hover:border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
+          </div>
+        )
+
+      case 'color':
+        return (
+          <div key={key}>
+            <label className="mb-1.5 block text-xs font-medium text-gray-500">
+              {label}
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={String(value) || String(paramConfig.defaultValue)}
+                onChange={(e) => updateParams({ [key]: e.target.value })}
+                className="h-10 w-16 cursor-pointer rounded-md border border-gray-200/80 bg-white/80"
+              />
+              <input
+                type="text"
+                value={String(value) || String(paramConfig.defaultValue)}
+                onChange={(e) => updateParams({ [key]: e.target.value })}
+                className="flex-1 rounded-md border border-gray-200/80 bg-white/80 px-3 py-2 text-sm transition-colors hover:border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                placeholder="#000000"
+              />
+            </div>
           </div>
         )
 
@@ -316,6 +357,26 @@ export function UnifiedControlPanel({
                         console.log('color added', _color)
                       }}
                     />
+
+                    {/* Additional color controls for algorithms that support them */}
+                    {params.algorithm === 'recursive' && (
+                      <div className="mt-4">
+                        <label className="mb-2 block text-xs font-medium text-gray-500">
+                          Background Color
+                        </label>
+                        <ColorPicker
+                          selectedColorId={params.backgroundColor || 'white'}
+                          onColorSelect={(color) =>
+                            updateParams({ backgroundColor: color })
+                          }
+                          onColorAdd={(_color) => {
+                            // TODO: Implement background color adding logic
+                            // eslint-disable-next-line no-console
+                            console.log('background color added', _color)
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (

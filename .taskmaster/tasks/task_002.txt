@@ -137,3 +137,610 @@ Implement real-time visual feedback mechanisms to ensure canvas updates instantl
 ### Details:
 The rendering part of the engine for each layer should access the `colorPalette` array from its parameters. Implement logic to cycle through, randomly select, or map colors from the palette to the individual points or shapes being drawn. This should be flexible enough to support different coloring strategies in the future.
 
+## 8. Refactor P5Sketch Component to Use Named Export [pending]
+### Dependencies: None
+### Description: Refactor the P5Sketch.tsx component to use a named export instead of a default export to comply with project coding standards, and update all imports accordingly.
+### Details:
+This task involves modifying the export pattern in the P5Sketch component to align with project coding standards as defined in CLAUDE.md:
+
+1. Locate the `components/P5Sketch.tsx` file
+2. Change the current implementation from:
+   ```tsx
+   export default function P5Sketch() {
+     // existing implementation
+   }
+   ```
+   
+   To a named export:
+   ```tsx
+   export function P5Sketch() {
+     // existing implementation
+   }
+   ```
+
+3. Search the entire codebase for imports of this component:
+   - Look for patterns like: `import P5Sketch from './components/P5Sketch'` or similar paths
+   - Update all import statements to use named imports: `import { P5Sketch } from './components/P5Sketch'`
+
+4. Special considerations:
+   - Check for any dynamic imports or lazy-loaded components that might reference this component
+   - Ensure that any test files importing this component are also updated
+   - Verify that any component composition patterns (Higher Order Components, render props) using P5Sketch are updated
+
+5. Update any documentation or comments that might reference the import pattern for this component
+
+This refactoring is part of standardizing the codebase to use consistent export patterns, which improves code readability and maintainability.
+
+## 9. Refactor Canvas Re-mounting Logic in P5Sketch Component [pending]
+### Dependencies: None
+### Description: Review and refactor the canvas re-mounting logic in components/P5Sketch.tsx at lines 44-58 to improve stability and reduce unnecessary re-renders, addressing potential instability issues.
+### Details:
+This task involves analyzing and refactoring the canvas re-mounting logic in the P5Sketch component to improve stability and performance:
+
+1. Analyze the current implementation at lines 44-58 in `components/P5Sketch.tsx`:
+   - Identify the causes of unnecessary re-mounts
+   - Determine which dependencies in useEffect hooks might be triggering excessive re-renders
+   - Evaluate the current approach to canvas lifecycle management
+
+2. Implement improvements:
+   - Refactor the useEffect dependency array to only include necessary dependencies
+   - Consider implementing useMemo or useCallback for functions or objects used in the dependency array
+   - Ensure proper cleanup in useEffect return functions to prevent memory leaks
+   - Potentially implement React.memo to prevent unnecessary re-renders of the component
+
+3. Specific code changes:
+   - Review the current p5.js instance creation and destruction logic
+   - Ensure canvas mounting/unmounting only occurs when genuinely needed
+   - Consider implementing a more robust state management approach for the p5 instance
+   - Add appropriate comments explaining the re-mounting conditions and logic
+
+4. Performance considerations:
+   - Measure and document the frequency of re-mounts before and after changes
+   - Ensure the refactored code maintains all existing functionality
+   - Consider browser-specific optimizations if necessary
+
+5. Documentation:
+   - Update any relevant comments in the code to explain the new approach
+   - Document any edge cases or considerations for future developers
+
+## 10. Add Type Safety for p5 Parameter in Engine Module [pending]
+### Dependencies: None
+### Description: Replace the `any` type for the `p5` parameter in `lib/engine/index.ts` at line 43 with a proper type definition to improve type safety and code quality.
+### Details:
+This task involves improving type safety in the jitter engine core by properly typing the p5 instance:
+
+1. Analyze the current implementation in `lib/engine/index.ts` at line 43 where the `p5` parameter is typed as `any`.
+
+2. Import the appropriate type from the p5.js library:
+   ```typescript
+   import p5 from 'p5';
+   // OR for more specific typing
+   import type P5 from 'p5';
+   ```
+
+3. Replace the `any` type with the proper p5 type:
+   ```typescript
+   // From:
+   function someFunction(p5: any, ...otherParams) {
+     // implementation
+   }
+   
+   // To:
+   function someFunction(p5: P5, ...otherParams) {
+     // implementation
+   }
+   ```
+
+4. If the function is using specific p5 features, consider using a more specific type or interface that extends the base p5 type.
+
+5. Ensure that all usages of the p5 parameter within the function body are compatible with the new type.
+
+6. Update any related function signatures or interfaces that might be affected by this type change.
+
+7. Verify that TypeScript compilation succeeds without errors after the changes.
+
+8. Add appropriate JSDoc comments to document the parameter's expected type and usage.
+
+## 11. Refactor Duplicate Layer Interface in JitterContext Component [pending]
+### Dependencies: None
+### Description: Remove the duplicate `Layer` interface definition in `components/JitterContext.tsx` (lines 11-16) and import it from `lib/types.ts` to resolve the conflict and improve code consistency.
+### Details:
+This task involves refactoring the duplicate type definition in the JitterContext component to improve code maintainability and consistency:
+
+1. Locate the duplicate `Layer` interface in `components/JitterContext.tsx` at lines 11-16:
+   ```typescript
+   interface Layer {
+     id: string;
+     name: string;
+     visible: boolean;
+     // other properties
+   }
+   ```
+
+2. Remove this duplicate interface definition from the file.
+
+3. Add an import statement at the top of the file to import the `Layer` interface from the central types file:
+   ```typescript
+   import { Layer } from '../lib/types';
+   ```
+
+4. Verify that all references to the `Layer` interface in `JitterContext.tsx` continue to work correctly after this change.
+
+5. Check if any properties or methods in the local interface definition differ from the one in `lib/types.ts`:
+   - If there are differences, either update the central definition in `lib/types.ts` to include all necessary properties
+   - Or create a more specific interface that extends the base `Layer` interface if needed
+
+6. Ensure proper relative path in the import statement based on the file structure.
+
+7. Run TypeScript type checking to confirm no type errors are introduced by this change.
+
+## 12. Implement Error Boundaries for P5.js Component [pending]
+### Dependencies: None
+### Description: Implement React error boundaries around the P5.js component to gracefully handle rendering failures and prevent the entire application from crashing when canvas rendering issues occur.
+### Details:
+This task involves implementing React error boundaries to isolate failures in the P5.js rendering component:
+
+1. Create a new `ErrorBoundary.tsx` component that extends React.Component with error handling capabilities:
+   ```tsx
+   import React, { Component, ErrorInfo, ReactNode } from 'react';
+
+   interface Props {
+     children: ReactNode;
+     fallback?: ReactNode;
+   }
+
+   interface State {
+     hasError: boolean;
+     error: Error | null;
+   }
+
+   export class ErrorBoundary extends Component<Props, State> {
+     constructor(props: Props) {
+       super(props);
+       this.state = { hasError: false, error: null };
+     }
+
+     static getDerivedStateFromError(error: Error): State {
+       return { hasError: true, error };
+     }
+
+     componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+       console.error('P5.js component error:', error, errorInfo);
+       // Optional: send error to logging service
+     }
+
+     render(): ReactNode {
+       if (this.state.hasError) {
+         return this.props.fallback || (
+           <div className="error-container">
+             <h3>Rendering Error</h3>
+             <p>There was a problem rendering the visualization.</p>
+             <button onClick={() => this.setState({ hasError: false, error: null })}>
+               Try Again
+             </button>
+           </div>
+         );
+       }
+
+       return this.props.children;
+     }
+   }
+   ```
+
+2. Wrap the P5Sketch component with the ErrorBoundary in its parent component:
+   ```tsx
+   import { P5Sketch } from './components/P5Sketch';
+   import { ErrorBoundary } from './components/ErrorBoundary';
+
+   function CanvasContainer() {
+     return (
+       <ErrorBoundary>
+         <P5Sketch />
+       </ErrorBoundary>
+     );
+   }
+   ```
+
+3. Add specific error handling within the P5Sketch component to catch and handle p5.js-specific errors:
+   ```tsx
+   export function P5Sketch() {
+     const setup = (p5: P5Instance, canvasParentRef: Element) => {
+       try {
+         // Existing setup code
+       } catch (error) {
+         console.error('Error in p5.js setup:', error);
+         // Handle specific setup errors if possible
+       }
+     };
+
+     const draw = (p5: P5Instance) => {
+       try {
+         // Existing draw code
+       } catch (error) {
+         console.error('Error in p5.js draw loop:', error);
+         p5.noLoop(); // Stop the animation loop on error
+         throw error; // Let the error boundary handle it
+       }
+     };
+
+     // Rest of component
+   }
+   ```
+
+4. Add error handling for any asynchronous operations within the P5Sketch component.
+
+5. Consider implementing a mechanism to restart the sketch after an error occurs, possibly with a reduced feature set or simpler rendering approach.
+
+## 13. Optimize Grid Generation Algorithm in Basic Algorithms Module [pending]
+### Dependencies: None
+### Description: Refactor the grid generation algorithm in `lib/engine/basicAlgorithms.ts` to improve performance for high-density values (up to 50), replacing the current inefficient nested loops implementation.
+### Details:
+This task involves optimizing the grid generation algorithm to improve performance for high-density values:
+
+1. Analyze the current implementation in `lib/engine/basicAlgorithms.ts`:
+   - Identify the nested loops that are causing performance issues
+   - Profile the current implementation to establish a performance baseline
+   - Determine which operations are most expensive
+
+2. Research and implement optimization strategies:
+   - Consider using spatial partitioning techniques instead of nested loops
+   - Evaluate whether a matrix-based approach would be more efficient
+   - Consider using Web Workers for computation if appropriate
+   - Implement memoization for repeated calculations
+   - Explore the possibility of using typed arrays for better memory management
+
+3. Implementation steps:
+   ```typescript
+   // Example optimization approach (pseudocode)
+   function generateGrid(density: number, width: number, height: number): Point[] {
+     // Pre-calculate grid dimensions based on density
+     const cellSize = Math.max(width, height) / density;
+     const cols = Math.ceil(width / cellSize);
+     const rows = Math.ceil(height / cellSize);
+     
+     // Use a more efficient data structure
+     const points: Point[] = new Array(cols * rows);
+     
+     // Single loop implementation with index calculation
+     for (let i = 0; i < cols * rows; i++) {
+       const col = i % cols;
+       const row = Math.floor(i / cols);
+       
+       points[i] = {
+         x: col * cellSize + (Math.random() * cellSize * jitterFactor),
+         y: row * cellSize + (Math.random() * cellSize * jitterFactor)
+       };
+     }
+     
+     return points;
+   }
+   ```
+
+4. Add performance monitoring:
+   - Implement timing measurements to compare before/after performance
+   - Add conditional debug logging that can be enabled for performance testing
+
+5. Update documentation:
+   - Add comments explaining the optimization approach
+   - Update any relevant documentation about performance characteristics
+   - Document the maximum supported density and expected performance
+
+## 14. Implement Memoization for Perlin Noise Calculations [pending]
+### Dependencies: None
+### Description: Optimize Perlin noise calculations in `lib/engine/advancedAlgorithms.ts` (lines 29-35) by implementing memoization to avoid redundant computations in tight loops.
+### Details:
+This task involves implementing memoization to optimize Perlin noise calculations:
+
+1. Analyze the current implementation in `lib/engine/advancedAlgorithms.ts` (lines 29-35):
+   - Identify the specific Perlin noise functions that are being called repeatedly
+   - Profile the current implementation to establish a performance baseline
+   - Determine which parameter combinations are most frequently reused
+
+2. Design a memoization strategy:
+   - Create a cache data structure (Map or object) to store previously computed values
+   - Define an appropriate key generation function that uniquely identifies input parameters
+   - Implement cache size limits to prevent memory issues during long-running animations
+
+3. Implement the memoized version of the Perlin noise function:
+   ```typescript
+   // Example implementation
+   const noiseCache = new Map<string, number>();
+   const MAX_CACHE_SIZE = 10000; // Adjust based on profiling
+
+   function memoizedNoise(x: number, y: number, z: number = 0): number {
+     // Create a unique key for these parameters
+     const key = `${x.toFixed(4)}_${y.toFixed(4)}_${z.toFixed(4)}`;
+     
+     // Check if result is already cached
+     if (noiseCache.has(key)) {
+       return noiseCache.get(key)!;
+     }
+     
+     // Compute the value
+     const result = originalNoiseFunction(x, y, z);
+     
+     // Manage cache size
+     if (noiseCache.size >= MAX_CACHE_SIZE) {
+       // Remove oldest entries (first 20% of cache)
+       const keysToRemove = Array.from(noiseCache.keys())
+         .slice(0, Math.floor(MAX_CACHE_SIZE * 0.2));
+       keysToRemove.forEach(k => noiseCache.delete(k));
+     }
+     
+     // Cache the result
+     noiseCache.set(key, result);
+     return result;
+   }
+   ```
+
+4. Replace the original Perlin noise function calls with the memoized version:
+   - Update the implementation in lines 29-35 to use the new memoized function
+   - Ensure the function signature remains compatible with existing code
+
+5. Add cache statistics for debugging (optional):
+   - Track cache hits/misses
+   - Log cache efficiency metrics during development
+
+6. Consider adding a cache reset function that can be called when parameters change significantly to avoid using stale cached values.
+
+## 15. Thread-Safe Refactoring of Global Perlin Noise Instance [pending]
+### Dependencies: None
+### Description: Refactor the global Perlin noise instance in `lib/engine/algorithmUtils.ts` (line 109) to ensure it is thread-safe and prevent potential race conditions during concurrent operations.
+### Details:
+This task involves refactoring the global Perlin noise instance to ensure thread safety and prevent race conditions:
+
+1. Analyze the current implementation in `lib/engine/algorithmUtils.ts` (line 109):
+   - Identify how the global Perlin noise instance is currently defined and used
+   - Determine potential race conditions that could occur during concurrent operations
+   - Assess the impact of the current implementation on multi-threaded environments
+
+2. Implement a thread-safe solution using one of these approaches:
+   - **Option A: Factory Pattern**
+     ```typescript
+     // Replace global instance:
+     // const perlinNoise = new PerlinNoise(); // Current implementation
+     
+     // With a factory function that returns isolated instances:
+     function getPerlinNoiseInstance() {
+       return new PerlinNoise();
+     }
+     ```
+   
+   - **Option B: Thread-Local Storage**
+     ```typescript
+     // If using Web Workers, implement a mechanism to create isolated instances per worker
+     class PerlinNoiseManager {
+       private static instances = new Map<string, PerlinNoise>();
+       
+       static getInstance(workerId: string): PerlinNoise {
+         if (!this.instances.has(workerId)) {
+           this.instances.set(workerId, new PerlinNoise());
+         }
+         return this.instances.get(workerId)!;
+       }
+     }
+     ```
+   
+   - **Option C: Immutable Implementation**
+     ```typescript
+     // Refactor PerlinNoise class to be stateless/immutable
+     class PerlinNoise {
+       constructor(private seed?: number) {
+         // Initialize with optional seed
+       }
+       
+       // Ensure all methods are pure functions that don't modify internal state
+       noise(x: number, y: number, z: number = 0): number {
+         // Implementation that doesn't rely on mutable state
+         // ...
+       }
+     }
+     ```
+
+3. Update all references to the global Perlin noise instance throughout the codebase:
+   - Search for all usages of the Perlin noise instance
+   - Modify each usage to align with the new thread-safe implementation
+   - Ensure backward compatibility or provide clear migration path
+
+4. Add documentation comments explaining the thread-safety considerations:
+   ```typescript
+   /**
+    * Thread-safe implementation of Perlin noise generator.
+    * Each call returns an isolated instance to prevent race conditions
+    * when used in concurrent environments.
+    */
+   ```
+
+5. Consider performance implications:
+   - Benchmark the new implementation against the original
+   - Optimize if necessary to minimize any performance overhead
+   - Document any performance trade-offs made for thread safety
+
+## 16. Implement Canvas Performance Optimizations [pending]
+### Dependencies: None
+### Description: Implement performance optimization techniques such as off-screen rendering and layer caching to improve canvas rendering performance, especially for complex or animated jitter patterns.
+### Details:
+This task involves implementing several canvas performance optimization techniques:
+
+1. Off-screen rendering:
+   - Create a secondary, off-screen canvas for rendering complex elements
+   - Implement a buffer system where patterns are rendered to an off-screen canvas first
+   - Only copy the completed render to the visible canvas when ready
+   - Example implementation:
+   ```typescript
+   // Create off-screen buffer
+   const offscreenCanvas = document.createElement('canvas');
+   offscreenCanvas.width = mainCanvas.width;
+   offscreenCanvas.height = mainCanvas.height;
+   const offscreenCtx = offscreenCanvas.getContext('2d');
+   
+   // Render to off-screen buffer
+   function renderToBuffer() {
+     // Perform complex rendering operations on offscreenCtx
+     // ...
+     
+     // Copy to main visible canvas only when complete
+     mainCtx.drawImage(offscreenCanvas, 0, 0);
+   }
+   ```
+
+2. Layer caching:
+   - Identify static or slowly changing elements in the jitter patterns
+   - Implement a caching system to store rendered layers that don't need frequent updates
+   - Only re-render layers when their parameters change
+   - Use a multi-layer approach where appropriate:
+     - Background layer (rarely changes)
+     - Mid-ground layer (changes occasionally)
+     - Foreground layer (changes frequently)
+
+3. Optimize the animation loop:
+   - Implement frame skipping for high-complexity patterns
+   - Add dynamic quality adjustment based on FPS monitoring
+   - Consider implementing a request-cancel pattern for the animation frame:
+   ```typescript
+   let animationFrameId: number;
+   
+   function startAnimation() {
+     cancelAnimationFrame(animationFrameId); // Cancel any existing request
+     animationFrameId = requestAnimationFrame(animate);
+   }
+   
+   function stopAnimation() {
+     cancelAnimationFrame(animationFrameId);
+   }
+   ```
+
+4. Implement canvas size optimization:
+   - Scale canvas based on device pixel ratio for crisp rendering
+   - Consider downscaling during rapid animations, then restoring quality when static
+   - Example implementation:
+   ```typescript
+   function optimizeCanvasForDevice() {
+     const dpr = window.devicePixelRatio || 1;
+     const rect = canvas.getBoundingClientRect();
+     
+     canvas.width = rect.width * dpr;
+     canvas.height = rect.height * dpr;
+     canvas.style.width = `${rect.width}px`;
+     canvas.style.height = `${rect.height}px`;
+     
+     ctx.scale(dpr, dpr);
+   }
+   ```
+
+5. Implement object pooling for frequently created/destroyed objects:
+   - Create a pool of reusable objects for pattern elements
+   - Recycle objects instead of creating new ones to reduce garbage collection
+   - Example implementation:
+   ```typescript
+   class ParticlePool {
+     private pool: Particle[] = [];
+     private activeParticles: Particle[] = [];
+     
+     constructor(size: number) {
+       // Pre-allocate particles
+       for (let i = 0; i < size; i++) {
+         this.pool.push(new Particle());
+       }
+     }
+     
+     getParticle(): Particle {
+       let particle = this.pool.pop();
+       if (!particle) {
+         particle = new Particle();
+       }
+       this.activeParticles.push(particle);
+       return particle;
+     }
+     
+     recycleParticle(particle: Particle) {
+       const index = this.activeParticles.indexOf(particle);
+       if (index > -1) {
+         this.activeParticles.splice(index, 1);
+         particle.reset();
+         this.pool.push(particle);
+       }
+     }
+   }
+   ```
+
+6. Integration with existing components:
+   - Modify the P5Sketch component to incorporate these optimization techniques
+   - Update the animation loop in Task #5 to leverage the new optimizations
+   - Ensure the optimizations work with the pattern extensibility from Task #6
+
+## 17. Implement Debouncing for Parameter Updates [pending]
+### Dependencies: None
+### Description: Implement debouncing mechanism for real-time parameter updates to prevent excessive canvas re-renders and improve performance when users adjust controls.
+### Details:
+This task involves implementing a debounce mechanism to optimize performance when parameters are updated:
+
+1. Identify all parameter update events:
+   - Locate all event handlers in the UnifiedControlPanel that trigger re-renders
+   - Focus on slider inputs, number inputs, and other controls that can change rapidly
+
+2. Create a debounce utility function:
+   ```typescript
+   // utils/debounce.ts
+   export function debounce<T extends (...args: any[]) => any>(
+     func: T,
+     wait: number
+   ): (...args: Parameters<T>) => void {
+     let timeout: ReturnType<typeof setTimeout> | null = null;
+     
+     return function(...args: Parameters<T>): void {
+       const later = () => {
+         timeout = null;
+         func(...args);
+       };
+       
+       if (timeout !== null) {
+         clearTimeout(timeout);
+       }
+       timeout = setTimeout(later, wait);
+     };
+   }
+   ```
+
+3. Apply debouncing to parameter update handlers:
+   ```typescript
+   // Before
+   const handleDensityChange = (value: number) => {
+     setDensity(value);
+     updateCanvas(); // Triggers re-render immediately
+   };
+   
+   // After
+   const handleDensityChange = useCallback((value: number) => {
+     setDensity(value);
+   }, []);
+   
+   const debouncedUpdateCanvas = useCallback(
+     debounce(() => {
+       updateCanvas();
+     }, 150), // 150ms delay
+     [updateCanvas]
+   );
+   
+   // Use effect to trigger the debounced update
+   useEffect(() => {
+     debouncedUpdateCanvas();
+   }, [density, debouncedUpdateCanvas]);
+   ```
+
+4. Implement visual feedback during debounce period:
+   - Add subtle visual indicators to show that changes are pending
+   - Consider using a small "updating" indicator that appears during the debounce period
+
+5. Make the debounce delay configurable:
+   - Add a configuration option for debounce delay (default: 150ms)
+   - Consider different delays for different parameter types (e.g., shorter for critical parameters)
+
+6. Special handling for certain parameters:
+   - Identify any parameters that should update immediately without debouncing
+   - Create a mechanism to bypass debouncing for these special cases
+
+7. Performance monitoring:
+   - Add performance tracking to measure the impact of debouncing
+   - Log render frequency before and after implementation
+

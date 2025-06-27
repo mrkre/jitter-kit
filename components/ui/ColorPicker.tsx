@@ -26,6 +26,8 @@ const defaultColors: Color[] = [
   { id: 'teal', value: '#14b8a6', name: 'Teal' },
   { id: 'red', value: '#ef4444', name: 'Red' },
   { id: 'yellow', value: '#eab308', name: 'Yellow' },
+  { id: 'white', value: '#ffffff', name: 'White' },
+  { id: 'black', value: '#000000', name: 'Black' },
 ]
 
 export function ColorPicker({

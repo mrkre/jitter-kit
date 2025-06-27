@@ -7,13 +7,7 @@ import {
   useCallback,
   ReactNode,
 } from 'react'
-
-interface Layer {
-  id: string
-  name: string
-  visible: boolean
-  locked: boolean
-}
+import { Layer } from '../lib/types'
 
 interface AlgorithmParams {
   // Common parameters
@@ -31,6 +25,15 @@ interface AlgorithmParams {
   // Recursive specific
   subdivisions?: number
   threshold?: number
+  numColumns?: number
+  numRows?: number
+  solidBarCount?: number
+  solidBarCountX?: number
+  solidBarCountY?: number
+  subdivisionMode?: 'linear' | 'exponential'
+  orientation?: 'vertical' | 'horizontal' | 'both'
+  cellPadding?: number
+  backgroundColor?: string
   // Isometric specific
   perspective?: number
   // Perlin specific
@@ -41,6 +44,7 @@ interface AlgorithmParams {
   branchLength?: number
   iterations?: number
   treeCount?: number
+  scalingExponent?: number
   // Particle specific
   particleCount?: number
   gravity?: number
@@ -111,6 +115,7 @@ export function JitterProvider({ children }: JitterProviderProps) {
     branchLength: 0.7,
     iterations: 6,
     treeCount: 8,
+    scalingExponent: 2.0,
     // Particle specific
     particleCount: 100,
     gravity: 0.2,
@@ -123,6 +128,15 @@ export function JitterProvider({ children }: JitterProviderProps) {
     axiom: 'F',
     rules: 'F=F+F-F-F+F',
     angle: 25,
+    // Grid/bar pattern specific defaults (safer for exponential mode)
+    numColumns: 15,
+    numRows: 15,
+    solidBarCountX: 0,
+    solidBarCountY: 0,
+    subdivisionMode: 'linear',
+    orientation: 'vertical',
+    cellPadding: 0,
+    backgroundColor: 'white',
   })
 
   const [layers, setLayers] = useState<Layer[]>([])
@@ -136,8 +150,56 @@ export function JitterProvider({ children }: JitterProviderProps) {
     const newLayer: Layer = {
       id: `layer-${Date.now()}`,
       name: `Layer ${layers.length + 1}`,
+      type: 'grid',
       visible: true,
       locked: false,
+      isClipped: false,
+      parameters: {
+        algorithm: params.algorithm as Layer['parameters']['algorithm'],
+        density: params.density,
+        gutter: params.gutter || 5,
+        colorPalette: ['#8B5CF6', '#EC4899', '#3B82F6', '#10B981'],
+        shapeVariety: params.shapeVariety,
+        sizeVariation: params.sizeVariation,
+        displacementIntensity: params.displacementIntensity,
+        colorVariation: params.colorVariation,
+        heightVariation: params.heightVariation,
+        noiseScale: params.noiseScale,
+        octaves: params.octaves,
+        subdivisions: params.subdivisions,
+        threshold: params.threshold,
+        perspective: params.perspective,
+        fieldStrength: params.fieldStrength,
+        flowSpeed: params.flowSpeed,
+        branchLength: params.branchLength,
+        branchAngle: params.branchAngle,
+        iterations: params.iterations,
+        treeCount: params.treeCount,
+        scalingExponent: params.scalingExponent,
+        particleCount: params.particleCount,
+        gravity: params.gravity,
+        friction: params.friction,
+        generations: params.generations,
+        survivalRules: params.survivalRules,
+        pattern: params.pattern,
+        axiom: params.axiom,
+        rules: params.rules,
+        angle: params.angle,
+        // Grid/bar pattern specific
+        numColumns: params.numColumns,
+        numRows: params.numRows,
+        solidBarCountX: params.solidBarCountX,
+        solidBarCountY: params.solidBarCountY,
+        subdivisionMode: params.subdivisionMode,
+        orientation: params.orientation,
+        cellPadding: params.cellPadding,
+        backgroundColor: params.backgroundColor,
+      },
+      animation: {
+        type: params.animationType as Layer['animation']['type'],
+        speed: params.speed,
+        duration: params.duration,
+      },
     }
     setLayers((prev) => [...prev, newLayer])
     setSelectedLayer(newLayer.id)
