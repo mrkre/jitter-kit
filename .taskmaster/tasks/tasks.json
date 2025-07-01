@@ -112,7 +112,7 @@
             "title": "Complete Canvas.tsx Component Structure",
             "description": "Set up the basic Canvas component with proper React integration, refs, and lifecycle management.",
             "details": "Implement the foundational structure for the Canvas component:\n\n1. **Component Setup:**\n   - Create or refactor Canvas.tsx with proper TypeScript interfaces\n   - Set up canvas ref management for direct DOM access\n   - Implement proper component props interface\n   - Add error boundary integration\n\n2. **React Integration:**\n   - Use useRef for canvas element access\n   - Implement useEffect hooks for mounting/unmounting\n   - Add proper cleanup functions to prevent memory leaks\n   - Handle component re-renders efficiently\n\n3. **Canvas Initialization:**\n   - Set up canvas context (2D or WebGL as needed)\n   - Configure canvas size and scaling\n   - Handle device pixel ratio for crisp rendering\n   - Set default canvas styling and attributes\n\n4. **Props Interface:**\n   - Define clear interface for canvas props\n   - Support dimension props (width, height)\n   - Add optional styling and className props\n   - Include callback props for events",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 3
           },
@@ -121,7 +121,7 @@
             "title": "Implement Jitter Engine Output Consumption",
             "description": "Connect the canvas to the jitter engine's drawing command output system.",
             "details": "Create the bridge between the jitter engine and canvas rendering:\n\n1. **Drawing Command Interface:**\n   - Import and use the DrawingCommand types from the engine\n   - Set up subscription to engine output updates\n   - Handle different command types (rect, ellipse, line, etc.)\n   - Implement command validation and error handling\n\n2. **Engine Integration:**\n   - Connect to JitterContext for layer data\n   - Subscribe to parameter changes from the state store\n   - Handle multiple layers and their individual commands\n   - Implement proper data flow from engine to canvas\n\n3. **Command Processing:**\n   - Create command parser for different drawing primitives\n   - Handle coordinate transformations if needed\n   - Process color and styling information\n   - Batch similar commands for performance\n\n4. **Update Mechanism:**\n   - Implement efficient update triggers\n   - Handle selective re-rendering when needed\n   - Manage frame rate and update frequency\n   - Add debugging and logging capabilities",
-            "status": "pending",
+            "status": "done",
             "dependencies": [1],
             "parentTaskId": 3
           },
@@ -139,7 +139,7 @@
             "title": "Add Canvas Lifecycle Management",
             "description": "Handle canvas mounting, unmounting, resizing, and state management properly.",
             "details": "Implement robust lifecycle management for the canvas component:\n\n1. **Component Lifecycle:**\n   - Handle component mounting and setup\n   - Implement proper unmounting and cleanup\n   - Manage component updates and re-renders\n   - Handle props changes gracefully\n\n2. **Canvas State Management:**\n   - Track canvas dimensions and scaling\n   - Manage animation state (playing/paused)\n   - Handle layer visibility states\n   - Store rendering preferences and settings\n\n3. **Resize Handling:**\n   - Implement responsive canvas sizing\n   - Handle window resize events\n   - Maintain aspect ratio if needed\n   - Update p5.js canvas size dynamically\n\n4. **Memory Management:**\n   - Clean up p5.js instances properly\n   - Remove event listeners on unmount\n   - Clear any timers or intervals\n   - Dispose of graphics buffers and textures\n\n5. **Error Recovery:**\n   - Handle rendering errors gracefully\n   - Implement fallback rendering modes\n   - Provide user feedback for issues\n   - Log errors for debugging",
-            "status": "pending",
+            "status": "done",
             "dependencies": [3],
             "parentTaskId": 3
           },

@@ -7,7 +7,8 @@ import { Maximize2, Minimize2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 const P5Sketch = dynamic(
-  () => import('./P5Sketch').then((mod) => ({ default: mod.P5Sketch })),
+  () =>
+    import('./P5SketchEngine').then((mod) => ({ default: mod.P5SketchEngine })),
   {
     ssr: false,
     loading: () => (
@@ -19,9 +20,10 @@ const P5Sketch = dynamic(
 )
 import { useJitter } from './JitterContext'
 import { Spinner } from './ui'
+import { ErrorBoundary } from './ErrorBoundary'
 
 export function Canvas() {
-  const { params, selectedLayer, layers } = useJitter()
+  const { selectedLayer, layers } = useJitter()
 
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
@@ -153,13 +155,18 @@ export function Canvas() {
       {/* P5.js Sketch */}
       <div className="flex h-full w-full items-center justify-center">
         {selectedLayer ? (
-          <P5Sketch
-            key="main-canvas" // Stable key - only one canvas instance
-            width={canvasSize.width}
-            height={canvasSize.height}
-            params={params}
-            selectedLayer={selectedLayer}
-          />
+          <ErrorBoundary
+            onError={() => {
+              // Error is logged by ErrorBoundary component
+              // Additional error handling can be added here if needed
+            }}
+          >
+            <P5Sketch
+              key="main-canvas" // Stable key - only one canvas instance
+              width={canvasSize.width}
+              height={canvasSize.height}
+            />
+          </ErrorBoundary>
         ) : (
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">

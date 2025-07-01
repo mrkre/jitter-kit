@@ -354,6 +354,79 @@ export const P5Sketch = memo(function P5Sketch({
                 p.endShape(p.CLOSE)
               }
               break
+            case 'triangle':
+              if (cmd.points && cmd.points.length === 3) {
+                p.triangle(
+                  cmd.points[0].x,
+                  cmd.points[0].y,
+                  cmd.points[1].x,
+                  cmd.points[1].y,
+                  cmd.points[2].x,
+                  cmd.points[2].y
+                )
+              }
+              break
+            case 'path':
+              if (cmd.commands) {
+                // Parse path commands (simplified SVG-like path)
+                p.beginShape()
+                const commands = cmd.commands.split(' ')
+                for (let i = 0; i < commands.length; i++) {
+                  const command = commands[i]
+                  if (command === 'M' && i + 2 < commands.length) {
+                    // Move to
+                    const x = parseFloat(commands[i + 1])
+                    const y = parseFloat(commands[i + 2])
+                    p.vertex(x, y)
+                    i += 2
+                  } else if (command === 'L' && i + 2 < commands.length) {
+                    // Line to
+                    const x = parseFloat(commands[i + 1])
+                    const y = parseFloat(commands[i + 2])
+                    p.vertex(x, y)
+                    i += 2
+                  }
+                }
+                p.endShape()
+              }
+              break
+            case 'particle':
+              // Particles are typically small circles with potential motion blur
+              if (cmd.radius) {
+                // Apply rotation if specified
+                if (cmd.rotation) {
+                  p.push()
+                  p.translate(cmd.position.x, cmd.position.y)
+                  p.rotate(cmd.rotation)
+                  p.circle(0, 0, cmd.radius * 2)
+                  p.pop()
+                } else {
+                  p.circle(cmd.position.x, cmd.position.y, cmd.radius * 2)
+                }
+
+                // Optional: Add motion blur effect for moving particles
+                if (
+                  cmd.velocity &&
+                  (cmd.velocity.x !== 0 || cmd.velocity.y !== 0)
+                ) {
+                  const blurSteps = 3
+                  for (let i = 1; i <= blurSteps; i++) {
+                    const alpha = (1 - i / blurSteps) * 0.3
+                    p.fill(
+                      p.red(p.color(cmd.color)),
+                      p.green(p.color(cmd.color)),
+                      p.blue(p.color(cmd.color)),
+                      alpha * 255
+                    )
+                    p.circle(
+                      cmd.position.x - cmd.velocity.x * i * 0.5,
+                      cmd.position.y - cmd.velocity.y * i * 0.5,
+                      cmd.radius * 2
+                    )
+                  }
+                }
+              }
+              break
           }
 
           p.pop()

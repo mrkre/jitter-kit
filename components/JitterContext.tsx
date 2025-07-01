@@ -6,8 +6,10 @@ import {
   useState,
   useCallback,
   ReactNode,
+  useEffect,
 } from 'react'
 import { Layer } from '../lib/types'
+import { useEngine } from '../lib/engine/engineContext'
 
 interface AlgorithmParams {
   // Common parameters
@@ -85,6 +87,7 @@ interface JitterProviderProps {
 }
 
 export function JitterProvider({ children }: JitterProviderProps) {
+  const { updateDrawingCommands } = useEngine()
   const [params, setParams] = useState<JitterParams>({
     density: 10,
     speed: 1,
@@ -224,6 +227,11 @@ export function JitterProvider({ children }: JitterProviderProps) {
       )
     )
   }
+
+  // Update engine when layers or selection changes
+  useEffect(() => {
+    updateDrawingCommands(layers, selectedLayer)
+  }, [layers, selectedLayer, updateDrawingCommands])
 
   return (
     <JitterContext.Provider
