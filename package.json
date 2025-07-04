@@ -16,7 +16,7 @@
     "typescript"
   ],
   "private": false,
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@10.12.4",
   "type": "module",
   "scripts": {
     "dev": "next dev",
